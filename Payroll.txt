@@ -1,3 +1,0 @@
-EMPLOYEE ID : 1 NAME : Naruto Uzumaki SALARY : 300000.0
-EMPLOYEE ID : 2 NAME : Shikamaru Nara SALARY : 290000.0
-EMPLOYEE ID : 3 NAME : Hashirama Senju SALARY : 400000.0
