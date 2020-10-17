@@ -14,8 +14,7 @@ public class EmployeePayrollService {
 	private List<EmployeePayrollData> employeePayrollList;
 	private static Logger log = Logger.getLogger(EmployeePayrollService.class.getName());
 
-	public EmployeePayrollService() {
-	}
+	public EmployeePayrollService() {}
 	
 	// Initializing the field which stores employee payroll details
 	public EmployeePayrollService(List<EmployeePayrollData> employeePayrollList) {
@@ -54,11 +53,23 @@ public class EmployeePayrollService {
 	
 	// Counting number of entries made to the file
 	public long countEntries(IOService ioService) {
-		return new EmployeePayrollFileIOService().countEntries();
+		if(ioService.equals(IOService.FILE_IO))
+			return new EmployeePayrollFileIOService().countEntries();
+		return 0;
 	}
 	
 	//Printing the employee payroll data
 	public void printData(IOService ioService) {
-		new EmployeePayrollFileIOService().printData();
+		if(ioService.equals(IOService.FILE_IO))
+			new EmployeePayrollFileIOService().printData();
+	}
+	
+	// Reading employee payroll data from file
+	public long readEmployeePayrollData(IOService ioService) {
+		List<String> employeeList = null;
+		if (ioService.equals(IOService.FILE_IO)) {
+			employeeList = new EmployeePayrollFileIOService().readData();
+		}
+		return employeeList.size();
 	}
 }
