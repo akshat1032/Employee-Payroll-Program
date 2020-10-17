@@ -55,5 +55,10 @@ public class EmployeePayrollService {
 	// Counting number of entries made to the file
 	public long countEntries(IOService ioService) {
 		return new EmployeePayrollFileIOService().countEntries();
-	}	
+	}
+	
+	//Printing the employee payroll data
+	public void printData(IOService ioService) {
+		new EmployeePayrollFileIOService().printData();
+	}
 }

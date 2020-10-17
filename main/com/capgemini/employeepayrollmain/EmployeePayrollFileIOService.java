@@ -29,5 +29,12 @@ public class EmployeePayrollFileIOService {
 			noOfEntries = Files.lines(new File("Payroll.txt").toPath()).count();
 		}catch(IOException e) {}
 		return noOfEntries;
-	}	
+	}
+	
+	// Printing employee payroll data
+	public void printData() {
+		try {
+			Files.lines(new File("Payroll.txt").toPath()).forEach(System.out::println);
+		}catch(IOException e) {}
+	}
 }
