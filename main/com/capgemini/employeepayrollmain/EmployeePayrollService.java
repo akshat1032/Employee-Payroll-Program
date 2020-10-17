@@ -6,29 +6,34 @@ import java.util.Scanner;
 import java.util.logging.*;
 
 public class EmployeePayrollService {
-	
-	public enum IOService{CONSOLE_IO,FILE_IO,DB_IO,REST_IO}
+
+	public enum IOService {
+		CONSOLE_IO, FILE_IO, DB_IO, REST_IO
+	}
+
 	private List<EmployeePayrollData> employeePayrollList;
-	private Logger log = Logger.getLogger(EmployeePayrollService.class.getName());
+	private static Logger log = Logger.getLogger(EmployeePayrollService.class.getName());
+
+	public EmployeePayrollService() {
+	}
 	
-	public EmployeePayrollService() {}
-	
+	// Initializing the field which stores employee payroll details
 	public EmployeePayrollService(List<EmployeePayrollData> employeePayrollList) {
 		this.employeePayrollList = employeePayrollList;
 	}
 
 	public static void main(String[] args) {
-		
-		Logger log = Logger.getLogger(EmployeePayrollService.class.getName());
-		//Welcome message added
+
+		// Welcome message added
 		log.info("Welcome to Employee Payroll Program");
 		ArrayList<EmployeePayrollData> employeePayrollList = new ArrayList<>();
 		EmployeePayrollService employeePayrollService = new EmployeePayrollService(employeePayrollList);
 		Scanner consoleInputReader = new Scanner(System.in);
 		employeePayrollService.readEmployeePayrollData(consoleInputReader);
-		employeePayrollService.writeEmployeePayrollData();
+		employeePayrollService.writeEmployeePayrollData(IOService.FILE_IO);
 	}
-
+	
+	// Taking details for employee from console
 	private void readEmployeePayrollData(Scanner consoleInputReader) {
 		log.info("Enter Employee ID");
 		int employeeId = consoleInputReader.nextInt();
@@ -38,8 +43,17 @@ public class EmployeePayrollService {
 		double salary = consoleInputReader.nextDouble();
 		employeePayrollList.add(new EmployeePayrollData(employeeId, employeeName, salary));
 	}
-	
-	private void writeEmployeePayrollData() {
-		System.out.println("Writing Employee Pyroll to Console\n"+employeePayrollList);
+
+	// Writing details for employee to file or console depending on user choice
+	public void writeEmployeePayrollData(IOService ioService) {
+		if (ioService.equals(IOService.CONSOLE_IO))
+			System.out.println("Writing Employee Pyroll to Console\n" + employeePayrollList);
+		else if (ioService.equals(IOService.FILE_IO))
+			new EmployeePayrollFileIOService().writeDataToFile(employeePayrollList);
 	}
+	
+	// Counting number of entries made to the file
+	public long countEntries(IOService ioService) {
+		return new EmployeePayrollFileIOService().countEntries();
+	}	
 }

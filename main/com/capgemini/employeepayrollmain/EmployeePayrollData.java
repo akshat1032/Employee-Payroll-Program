@@ -8,7 +8,6 @@ public class EmployeePayrollData {
 
 	// Parameterized constructor to initialize instance members
 	public EmployeePayrollData(int id, String name, double salary) {
-		super();
 		this.id = id;
 		this.name = name;
 		this.salary = salary;
