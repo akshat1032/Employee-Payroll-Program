@@ -13,24 +13,9 @@ public class EmployeePayrollData {
 		this.salary = salary;
 	}
 
-	// @return the id
-	public int getId() {
-		return id;
-	}
-
-	// @return the name
-	public String getName() {
-		return name;
-	}
-
-	// @return the salary
-	public double getSalary() {
-		return salary;
-	}
-	
 	@Override
 	public String toString() {
-		return "EMPLOYEE ID : "+this.id+" NAME : "+this.name+" SALARY : "+this.salary;
+		return "EMPLOYEE ID : " + this.id + " NAME : " + this.name + " SALARY : " + this.salary;
 	}
 
 }
