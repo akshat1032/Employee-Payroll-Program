@@ -14,8 +14,9 @@ public class EmployeePayrollService {
 	private List<EmployeePayrollData> employeePayrollList;
 	private static Logger log = Logger.getLogger(EmployeePayrollService.class.getName());
 
-	public EmployeePayrollService() {}
-	
+	public EmployeePayrollService() {
+	}
+
 	// Initializing the field which stores employee payroll details
 	public EmployeePayrollService(List<EmployeePayrollData> employeePayrollList) {
 		this.employeePayrollList = employeePayrollList;
@@ -31,7 +32,7 @@ public class EmployeePayrollService {
 		employeePayrollService.readEmployeePayrollData(consoleInputReader);
 		employeePayrollService.writeEmployeePayrollData(IOService.FILE_IO);
 	}
-	
+
 	// Taking details for employee from console
 	private void readEmployeePayrollData(Scanner consoleInputReader) {
 		log.info("Enter Employee ID");
@@ -50,26 +51,25 @@ public class EmployeePayrollService {
 		else if (ioService.equals(IOService.FILE_IO))
 			new EmployeePayrollFileIOService().writeDataToFile(employeePayrollList);
 	}
-	
+
 	// Counting number of entries made to the file
 	public long countEntries(IOService ioService) {
-		if(ioService.equals(IOService.FILE_IO))
+		if (ioService.equals(IOService.FILE_IO))
 			return new EmployeePayrollFileIOService().countEntries();
 		return 0;
 	}
-	
-	//Printing the employee payroll data
+
+	// Printing the employee payroll data
 	public void printData(IOService ioService) {
-		if(ioService.equals(IOService.FILE_IO))
+		if (ioService.equals(IOService.FILE_IO))
 			new EmployeePayrollFileIOService().printData();
 	}
-	
+
 	// Reading employee payroll data from file
 	public long readEmployeePayrollData(IOService ioService) {
-		List<String> employeeList = null;
 		if (ioService.equals(IOService.FILE_IO)) {
-			employeeList = new EmployeePayrollFileIOService().readData();
+			this.employeePayrollList = new EmployeePayrollFileIOService().readData();
 		}
-		return employeeList.size();
+		return employeePayrollList.size();
 	}
 }

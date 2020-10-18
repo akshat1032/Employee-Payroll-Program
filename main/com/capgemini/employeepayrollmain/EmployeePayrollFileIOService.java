@@ -41,11 +41,13 @@ public class EmployeePayrollFileIOService {
 	}
 	
 	// Read employee payroll details
-	public List<String> readData(){
-		List<String> employeeList = new ArrayList<>();
+	public List<EmployeePayrollData> readData(){
+		List<EmployeePayrollData> employeeList = new ArrayList<>();
+		Object[] employeeData = new Object[3];
 		try {
-			employeeList = Files.lines(new File("Payroll.txt").toPath())
-			.map(line -> line.trim()).collect(Collectors.toList());
+			employeeData = Files.lines(new File("Payroll.txt").toPath())
+					.map(line -> line.toString().split("EMPLOYEE ID :  NAME :  SALARY : ,")).toArray();
+			employeeList.add(new EmployeePayrollData(Integer.parseInt((String) employeeData[0]), (String)employeeData[1], Double.parseDouble((String)employeeData[2])));
 		}catch(IOException e) {}
 		return employeeList;
 	}
