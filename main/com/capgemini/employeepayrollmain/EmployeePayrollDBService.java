@@ -114,7 +114,8 @@ public class EmployeePayrollDBService {
 
 	// Preparing the statement
 	private void prepareStatementForEmployeeData() {
-		try (Connection connection = this.getConnection();) {
+		try {
+			Connection connection = this.getConnection();
 			String query = "select * from EmployeePayroll where name = ?";
 			employeePayrollDataStatement = connection.prepareStatement(query);
 		} catch (SQLException e) {
