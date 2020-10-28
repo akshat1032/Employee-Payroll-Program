@@ -98,4 +98,9 @@ public class EmployeePayrollService {
 		List<EmployeePayrollData> employeePayrollDataList = employeePayrollDBService.getEmployeePayrollData(name);
 		return employeePayrollDataList.get(0).equals(getEmployeePayrollData(name));
 	}
+
+	public List<EmployeePayrollData> readDataByQuery(String query) throws DatabaseServiceException {
+		this.employeePayrollList = employeePayrollDBService.readDataByQuery(query);
+		return employeePayrollList;
+	}
 }

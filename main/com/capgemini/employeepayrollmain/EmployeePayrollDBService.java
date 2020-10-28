@@ -121,4 +121,17 @@ public class EmployeePayrollDBService {
 			e.printStackTrace();
 		}
 	}
+	
+	// Execute given query
+	public List<EmployeePayrollData> readDataByQuery(String query) throws DatabaseServiceException {
+		List<EmployeePayrollData> employeePayrollList = new ArrayList<>();
+		try (Connection connection = this.getConnection();) {
+			Statement statement = connection.createStatement();
+			ResultSet employeePayroll = statement.executeQuery(query);
+			employeePayrollList = this.getEmployeePayrollData(employeePayroll);
+		} catch (Exception e) {
+			throw new DatabaseServiceException("Cannot create or establish connection to database");
+		}
+		return employeePayrollList;
+	}
 }

@@ -41,7 +41,15 @@ public class EmployeePayrollServiceTest {
 		List<EmployeePayrollData> employeePayrollList = employeePayrollService.readEmployeePayrollData(IOService.DB_IO);
 		employeePayrollService.updateEmployeeSalary("Terissa",300000.00);
 		boolean result = employeePayrollService.checkEmployeePayrollSyncWithDB("Terissa");
-		Assert.assertTrue(result);
-		
+		Assert.assertTrue(result);	
+	}
+	
+	// Testing retrieving data as per given query
+	@Test
+	public void testRetrieveDataAsPerQuery() throws DatabaseServiceException {
+		EmployeePayrollService employeePayrollService = new EmployeePayrollService();
+		String query = "select * from EmployeePayroll where start between cast('2018-01-01' as date) and date(now());";
+		List<EmployeePayrollData> employeePayrollList = employeePayrollService.readDataByQuery(query);
+		Assert.assertEquals(3, employeePayrollList.size());
 	}
 }
