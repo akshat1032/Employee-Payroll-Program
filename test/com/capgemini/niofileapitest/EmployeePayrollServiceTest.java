@@ -1,10 +1,12 @@
 package test.com.capgemini.niofileapitest;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+import main.com.capgemini.employeepayrollmain.DatabaseServiceException;
 import main.com.capgemini.employeepayrollmain.EmployeePayrollData;
 import main.com.capgemini.employeepayrollmain.EmployeePayrollService;
 import main.com.capgemini.employeepayrollmain.EmployeePayrollService.IOService;
@@ -23,11 +25,12 @@ public class EmployeePayrollServiceTest {
 		long noOfEntries = employeePayrollService.countEntries(IOService.FILE_IO);
 		Assert.assertEquals(3, noOfEntries);
 	}
-	// Testing reading data from file
+	
+	// Testing reading data from database
 	@Test
-	public void testReadEmployeeData() {
+	public void testReadEmployeeDataFromDatabase() throws DatabaseServiceException {
 		EmployeePayrollService employeePayrollService = new EmployeePayrollService();
-		long entries = employeePayrollService.readEmployeePayrollData(IOService.FILE_IO);
-		Assert.assertEquals(3, entries);
+		long noOfEntries = employeePayrollService.readEmployeePayrollData(IOService.DB_IO);
+		Assert.assertEquals(3, noOfEntries);
 	}
 }

@@ -48,7 +48,7 @@ public class EmployeePayrollService {
 	public void writeEmployeePayrollData(IOService ioService) {
 		if (ioService.equals(IOService.CONSOLE_IO))
 			System.out.println("Writing Employee Pyroll to Console\n" + employeePayrollList);
-		else if (ioService.equals(IOService.FILE_IO))
+		if (ioService.equals(IOService.FILE_IO))
 			new EmployeePayrollFileIOService().writeDataToFile(employeePayrollList);
 	}
 
@@ -66,10 +66,11 @@ public class EmployeePayrollService {
 	}
 
 	// Reading employee payroll data from file
-	public long readEmployeePayrollData(IOService ioService) {
-		if (ioService.equals(IOService.FILE_IO)) {
+	public long readEmployeePayrollData(IOService ioService) throws DatabaseServiceException {
+		if (ioService.equals(IOService.FILE_IO))
 			this.employeePayrollList = new EmployeePayrollFileIOService().readData();
-		}
+		if (ioService.equals(IOService.DB_IO))
+			this.employeePayrollList = new EmployeePayrollDBService().readData();
 		return employeePayrollList.size();
 	}
 }
