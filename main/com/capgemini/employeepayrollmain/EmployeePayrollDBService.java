@@ -53,15 +53,27 @@ public class EmployeePayrollDBService {
 
 	// Update employee data
 	public int updateEmployeeData(String name, double salary) {
-		return this.updateDataUsingStatement(name, salary);
+		return this.updateDataUsingPreparedStatement(name, salary);
 	}
 
 	// Updating data using statement
 	private int updateDataUsingStatement(String name, double salary) {
-		String query = String.format("update EmployeePayroll set salary = '%.2f' where name = '%s'", salary, name);
+		String query = String.format("update EmployeePayroll set salary = '%.2f' where name = '%s';", salary, name);
 		try (Connection connection = this.getConnection();) {
 			Statement statement = connection.createStatement();
 			return statement.executeUpdate(query);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+
+	// Updating data using prepared statement
+	private int updateDataUsingPreparedStatement(String name, Double salary) {
+		String query = String.format("update EmployeePayroll set salary = %.2f where name='%s';", salary, name);
+		try (Connection connection = this.getConnection();) {
+			PreparedStatement prepareStatement = connection.prepareStatement(query);
+			return prepareStatement.executeUpdate(query);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
