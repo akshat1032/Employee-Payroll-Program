@@ -12,13 +12,16 @@ public class EmployeePayrollService {
 	}
 
 	private List<EmployeePayrollData> employeePayrollList;
+	private EmployeePayrollDBService employeePayrollDBService;
 	private static Logger log = Logger.getLogger(EmployeePayrollService.class.getName());
 
 	public EmployeePayrollService() {
+		employeePayrollDBService = EmployeePayrollDBService.getInstance();
 	}
 
 	// Initializing the field which stores employee payroll details
 	public EmployeePayrollService(List<EmployeePayrollData> employeePayrollList) {
+		this();
 		this.employeePayrollList = employeePayrollList;
 	}
 
@@ -66,11 +69,33 @@ public class EmployeePayrollService {
 	}
 
 	// Reading employee payroll data from file
-	public long readEmployeePayrollData(IOService ioService) throws DatabaseServiceException {
+	public List<EmployeePayrollData> readEmployeePayrollData(IOService ioService) throws DatabaseServiceException {
 		if (ioService.equals(IOService.FILE_IO))
 			this.employeePayrollList = new EmployeePayrollFileIOService().readData();
 		if (ioService.equals(IOService.DB_IO))
-			this.employeePayrollList = new EmployeePayrollDBService().readData();
-		return employeePayrollList.size();
+			this.employeePayrollList = employeePayrollDBService.readData();
+		return employeePayrollList;
+	}
+
+	// Updating the data
+	public void updateEmployeeSalary(String name, double salary) {
+		int result = employeePayrollDBService.updateEmployeeData(name, salary);
+		if (result == 0) return;
+		EmployeePayrollData employeePayrollData = this.getEmployeePayrollData(name);
+		if (employeePayrollData != null)
+			employeePayrollData.salary = salary;
+	}
+
+	// Returning employee payroll data object
+	private EmployeePayrollData getEmployeePayrollData(String name) {
+		return this.employeePayrollList.stream()
+				.filter(employeePayrollDataItem -> employeePayrollDataItem.name.equals(name))
+				.findFirst()
+				.orElse(null);
+	}
+
+	public boolean checkEmployeePayrollSyncWithDB(String name) {
+		List<EmployeePayrollData> employeePayrollDataList = employeePayrollDBService.getEmployeePayrollData(name);
+		return employeePayrollDataList.get(0).equals(getEmployeePayrollData(name));
 	}
 }

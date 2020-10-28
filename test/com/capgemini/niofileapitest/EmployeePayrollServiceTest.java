@@ -22,7 +22,7 @@ public class EmployeePayrollServiceTest {
 		EmployeePayrollService employeePayrollService = new EmployeePayrollService(Arrays.asList(employeeData));
 		employeePayrollService.writeEmployeePayrollData(IOService.FILE_IO);
 		employeePayrollService.printData(IOService.FILE_IO);
-		long noOfEntries = employeePayrollService.countEntries(IOService.FILE_IO);
+		long noOfEntries  = employeePayrollService.countEntries(IOService.FILE_IO);
 		Assert.assertEquals(3, noOfEntries);
 	}
 	
@@ -30,7 +30,18 @@ public class EmployeePayrollServiceTest {
 	@Test
 	public void testReadEmployeeDataFromDatabase() throws DatabaseServiceException {
 		EmployeePayrollService employeePayrollService = new EmployeePayrollService();
-		long noOfEntries = employeePayrollService.readEmployeePayrollData(IOService.DB_IO);
-		Assert.assertEquals(3, noOfEntries);
+		List<EmployeePayrollData> employeePayrollList = employeePayrollService.readEmployeePayrollData(IOService.DB_IO);
+		Assert.assertEquals(3, employeePayrollList.size());
+	}
+	
+	// Testing update data in database
+	@Test
+	public void testUpdateEmployeeDataInDatabase() throws DatabaseServiceException {
+		EmployeePayrollService employeePayrollService = new EmployeePayrollService();
+		List<EmployeePayrollData> employeePayrollList = employeePayrollService.readEmployeePayrollData(IOService.DB_IO);
+		employeePayrollService.updateEmployeeSalary("Terissa",300000.00);
+		boolean result = employeePayrollService.checkEmployeePayrollSyncWithDB("Terissa");
+		Assert.assertTrue(result);
+		
 	}
 }
