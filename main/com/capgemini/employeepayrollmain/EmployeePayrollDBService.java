@@ -102,9 +102,10 @@ public class EmployeePayrollDBService {
 			while (resultSet.next()) {
 				int id = resultSet.getInt("ID");
 				String name = resultSet.getString("NAME");
+				String gender = resultSet.getString("GENDER");
 				double salary = resultSet.getDouble("SALARY");
 				LocalDate start = resultSet.getDate("START").toLocalDate();
-				employeePayrollList.add(new EmployeePayrollData(id, name, salary, start));
+				employeePayrollList.add(new EmployeePayrollData(id, name, gender, salary, start));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -134,5 +135,20 @@ public class EmployeePayrollDBService {
 			throw new DatabaseServiceException("Cannot create or establish connection to database");
 		}
 		return employeePayrollList;
+	}
+
+	public double performDBOperations(String query) {
+		double value = 0;
+		try {
+			Connection connection = this.getConnection();
+			Statement statement = connection.createStatement();
+			ResultSet resultSet = statement.executeQuery(query);
+			while (resultSet.next()) {
+				value = resultSet.getDouble(1);	
+			}
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}
+		return value;
 	}
 }

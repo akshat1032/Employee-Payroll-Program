@@ -103,4 +103,8 @@ public class EmployeePayrollService {
 		this.employeePayrollList = employeePayrollDBService.readDataByQuery(query);
 		return employeePayrollList;
 	}
+
+	public double performOperations(String query) {
+		return employeePayrollDBService.performDBOperations(query);
+	}
 }

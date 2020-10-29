@@ -6,6 +6,7 @@ public class EmployeePayrollData {
 
 	private int id;
 	public String name;
+	private String gender;
 	public double salary;
 	private LocalDate start;
 
@@ -21,9 +22,14 @@ public class EmployeePayrollData {
 		this.start = start;
 	}
 
+	public EmployeePayrollData(int id, String name, String gender, double salary, LocalDate start) {
+		this(id,name,salary,start);
+		this.gender = gender;
+	}
+
 	@Override
 	public String toString() {
-		return "EMPLOYEE ID : " + this.id + " NAME : " + this.name + " SALARY : " + this.salary+" START : "+this.start;
+		return "EMPLOYEE ID : " + this.id + " NAME : " + this.name +" GENDER : "+this.gender+ " SALARY : " + this.salary+" START : "+this.start;
 	}
 
 	@Override
