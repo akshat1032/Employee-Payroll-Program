@@ -1,5 +1,6 @@
 package main.com.capgemini.employeepayrollmain;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -13,7 +14,7 @@ public class EmployeePayrollService {
 
 	private List<EmployeePayrollData> employeePayrollList;
 	private EmployeePayrollDBService employeePayrollDBService;
-	private static Logger log = Logger.getLogger(EmployeePayrollService.class.getName());
+	static Logger log = Logger.getLogger(EmployeePayrollService.class.getName());
 
 	public EmployeePayrollService() {
 		employeePayrollDBService = EmployeePayrollDBService.getInstance();
@@ -76,11 +77,24 @@ public class EmployeePayrollService {
 			this.employeePayrollList = employeePayrollDBService.readData();
 		return employeePayrollList;
 	}
+	
+	// Reading employee data for date range
+	public List<EmployeePayrollData> readEmployeePayrollDataForDateRange(IOService ioService, LocalDate start,
+			LocalDate end) throws DatabaseServiceException {
+		if (ioService.equals(IOService.DB_IO))
+			try {
+				return employeePayrollDBService.getEmployeeForDateRange(start, end);
+			} catch (DatabaseServiceException e) {
+				e.printStackTrace();
+			}
+		return null;
+	}
 
 	// Updating the data
 	public void updateEmployeeSalary(String name, double salary) {
 		int result = employeePayrollDBService.updateEmployeeData(name, salary);
-		if (result == 0) return;
+		if (result == 0)
+			return;
 		EmployeePayrollData employeePayrollData = this.getEmployeePayrollData(name);
 		if (employeePayrollData != null)
 			employeePayrollData.salary = salary;
@@ -89,22 +103,11 @@ public class EmployeePayrollService {
 	// Returning employee payroll data object
 	private EmployeePayrollData getEmployeePayrollData(String name) {
 		return this.employeePayrollList.stream()
-				.filter(employeePayrollDataItem -> employeePayrollDataItem.name.equals(name))
-				.findFirst()
-				.orElse(null);
+				.filter(employeePayrollDataItem -> employeePayrollDataItem.name.equals(name)).findFirst().orElse(null);
 	}
 
 	public boolean checkEmployeePayrollSyncWithDB(String name) {
 		List<EmployeePayrollData> employeePayrollDataList = employeePayrollDBService.getEmployeePayrollData(name);
 		return employeePayrollDataList.get(0).equals(getEmployeePayrollData(name));
-	}
-
-	public List<EmployeePayrollData> readDataByQuery(String query) throws DatabaseServiceException {
-		this.employeePayrollList = employeePayrollDBService.readDataByQuery(query);
-		return employeePayrollList;
-	}
-
-	public double performOperations(String query) {
-		return employeePayrollDBService.performDBOperations(query);
 	}
 }

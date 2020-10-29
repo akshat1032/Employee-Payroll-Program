@@ -1,6 +1,7 @@
 package main.com.capgemini.employeepayrollmain;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,7 +14,7 @@ import java.util.logging.*;
 
 public class EmployeePayrollDBService {
 
-	private Logger log = Logger.getLogger(EmployeePayrollData.class.getName());
+	private static Logger log = Logger.getLogger(EmployeePayrollDBService.class.getName());
 	private PreparedStatement employeePayrollDataStatement;
 	private static EmployeePayrollDBService employeePayrollDBService;
 
@@ -26,20 +27,7 @@ public class EmployeePayrollDBService {
 		return employeePayrollDBService;
 	}
 
-	// Reading data from database
-	public List<EmployeePayrollData> readData() throws DatabaseServiceException {
-		List<EmployeePayrollData> employeePayrollList = new ArrayList<>();
-		try (Connection connection = this.getConnection();) {
-			String query = "select * from EmployeePayroll";
-			Statement statement = connection.createStatement();
-			ResultSet employeePayroll = statement.executeQuery(query);
-			employeePayrollList = this.getEmployeePayrollData(employeePayroll);
-		} catch (Exception e) {
-			throw new DatabaseServiceException("Cannot create or establish connection to database");
-		}
-		return employeePayrollList;
-	}
-
+	// Establishing connection and getting connection object
 	private Connection getConnection() throws SQLException {
 		String jdbcURL = "jdbc:mysql://localhost:3306/payroll_service?useSSL=false";
 		String userName = "root";
@@ -49,6 +37,18 @@ public class EmployeePayrollDBService {
 		con = DriverManager.getConnection(jdbcURL, userName, password);
 		log.info("Connection is successful : " + con);
 		return con;
+	}
+
+	// Reading data from database
+	public List<EmployeePayrollData> readData() throws DatabaseServiceException {
+		List<EmployeePayrollData> employeePayrollList = new ArrayList<>();
+		try {
+			String query = "select * from EmployeePayroll";
+			employeePayrollList = this.getEmployeePayrollDataUsingDB(query);
+		} catch (Exception e) {
+			throw new DatabaseServiceException("Cannot create or establish connection to database");
+		}
+		return employeePayrollList;
 	}
 
 	// Update employee data
@@ -113,19 +113,8 @@ public class EmployeePayrollDBService {
 		return employeePayrollList;
 	}
 
-	// Preparing the statement
-	private void prepareStatementForEmployeeData() {
-		try {
-			Connection connection = this.getConnection();
-			String query = "select * from EmployeePayroll where name = ?";
-			employeePayrollDataStatement = connection.prepareStatement(query);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
-	
 	// Execute given query
-	public List<EmployeePayrollData> readDataByQuery(String query) throws DatabaseServiceException {
+	public List<EmployeePayrollData> getEmployeePayrollDataUsingDB(String query) throws DatabaseServiceException {
 		List<EmployeePayrollData> employeePayrollList = new ArrayList<>();
 		try (Connection connection = this.getConnection();) {
 			Statement statement = connection.createStatement();
@@ -136,19 +125,28 @@ public class EmployeePayrollDBService {
 		}
 		return employeePayrollList;
 	}
-
-	public double performDBOperations(String query) {
-		double value = 0;
+	
+	// Retrieving employees for date range
+	public List<EmployeePayrollData> getEmployeeForDateRange(LocalDate start, LocalDate end)
+			throws DatabaseServiceException {
+		String query = String.format("select * from employeepayroll where start between '%s' and '%s'",
+				Date.valueOf(start), Date.valueOf(end));
 		try {
-			Connection connection = this.getConnection();
-			Statement statement = connection.createStatement();
-			ResultSet resultSet = statement.executeQuery(query);
-			while (resultSet.next()) {
-				value = resultSet.getDouble(1);	
-			}
-		}catch(SQLException e) {
+			return this.getEmployeePayrollDataUsingDB(query);
+		} catch (DatabaseServiceException e) {
 			e.printStackTrace();
 		}
-		return value;
+		return null;
+	}
+
+	// Preparing the statement
+	private void prepareStatementForEmployeeData() {
+		try {
+			Connection connection = this.getConnection();
+			String query = "select * from EmployeePayroll where name = ?";
+			employeePayrollDataStatement = connection.prepareStatement(query);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 }
