@@ -1,5 +1,6 @@
 package test.com.capgemini.niofileapitest;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
@@ -48,8 +49,10 @@ public class EmployeePayrollServiceTest {
 	@Test
 	public void testRetrieveDataAsPerQuery() throws DatabaseServiceException {
 		EmployeePayrollService employeePayrollService = new EmployeePayrollService();
-		String query = "select * from EmployeePayroll where start between cast('2018-01-01' as date) and date(now());";
-		List<EmployeePayrollData> employeePayrollList = employeePayrollService.readDataByQuery(query);
-		Assert.assertEquals(3, employeePayrollList.size());
+		employeePayrollService.readEmployeePayrollData(IOService.DB_IO);
+		LocalDate start = LocalDate.of(2018, 01, 01);
+		LocalDate end = LocalDate.now();
+		List<EmployeePayrollData> employeePayrollData = employeePayrollService.readEmployeePayrollDataForDateRange(IOService.DB_IO,start,end);
+		Assert.assertEquals(3, employeePayrollData.size());
 	}
 }
