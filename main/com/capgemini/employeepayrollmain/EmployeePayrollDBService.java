@@ -9,7 +9,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.*;
 
 public class EmployeePayrollDBService {
@@ -125,7 +127,7 @@ public class EmployeePayrollDBService {
 		}
 		return employeePayrollList;
 	}
-	
+
 	// Retrieving employees for date range
 	public List<EmployeePayrollData> getEmployeeForDateRange(LocalDate start, LocalDate end)
 			throws DatabaseServiceException {
@@ -137,6 +139,24 @@ public class EmployeePayrollDBService {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	// Retrieve average salary from database
+	public Map<String, Double> getAverageSalaryByGender() throws DatabaseServiceException {
+		String query = "select gender,avg(salary) as averageSalary from employeepayroll group by gender";
+		Map<String, Double> averageSalaryByGender = new HashMap<>();
+		try (Connection connection = this.getConnection()) {
+			Statement statement = connection.createStatement();
+			ResultSet resultSet = statement.executeQuery(query);
+			while (resultSet.next()) {
+				String gender = resultSet.getString("gender");
+				double avgSalary = resultSet.getDouble("averageSalary");
+				averageSalaryByGender.put(gender, avgSalary);
+			}
+		} catch (SQLException e) {
+			throw new DatabaseServiceException("Error in accessing database!");
+		}
+		return averageSalaryByGender;
 	}
 
 	// Preparing the statement

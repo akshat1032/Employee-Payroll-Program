@@ -3,6 +3,7 @@ package main.com.capgemini.employeepayrollmain;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.logging.*;
 
@@ -84,6 +85,17 @@ public class EmployeePayrollService {
 		if (ioService.equals(IOService.DB_IO))
 			try {
 				return employeePayrollDBService.getEmployeeForDateRange(start, end);
+			} catch (DatabaseServiceException e) {
+				e.printStackTrace();
+			}
+		return null;
+	}
+	
+	// Reading average salary from database
+	public Map<String, Double> readAverageSalaryByGender(IOService ioService) throws DatabaseServiceException {
+		if(ioService.equals(IOService.DB_IO))
+			try {
+				return employeePayrollDBService.getAverageSalaryByGender();
 			} catch (DatabaseServiceException e) {
 				e.printStackTrace();
 			}
