@@ -104,7 +104,7 @@ public class EmployeePayrollService {
 	
 	// Inserting employee to database
 	public void addEmployeeToDatabase(String name, String gender, double salary, LocalDate start) {
-		employeePayrollList.add(employeePayrollDBService.addEmployeeToDatabase(name, gender, salary, start));
+		employeePayrollList.add(employeePayrollDBService.addEmployeeToDatabaseWithPayrollDetails(name, gender, salary, start));
 	}
 
 	// Updating the data
