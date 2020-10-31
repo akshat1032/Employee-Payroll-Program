@@ -67,8 +67,8 @@ public class EmployeePayrollNormaliseDBService {
 		try {
 			Statement statement = connection.createStatement();
 			String query = String.format(
-					"insert into employeepayroll(name,gender,salary,start,company_id) VALUES ('%s','%s','%s','%s','%s');", name,
-					gender, salary, Date.valueOf(start), companyId);
+					"insert into employeepayroll(name,gender,salary,start,company_id) VALUES ('%s','%s','%s','%s','%s');",
+					name, gender, salary, Date.valueOf(start), companyId);
 			int rowsAffected = statement.executeUpdate(query, Statement.RETURN_GENERATED_KEYS);
 			if (rowsAffected == 1) {
 				ResultSet resultSet = statement.getGeneratedKeys();
@@ -150,8 +150,7 @@ public class EmployeePayrollNormaliseDBService {
 			connection.commit();
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
-		finally {
+		} finally {
 			if (connection != null) {
 				try {
 					connection.close();
@@ -214,6 +213,47 @@ public class EmployeePayrollNormaliseDBService {
 			employeePayrollList = this.getEmployeePayrollData(resultSet);
 		} catch (SQLException e) {
 			e.printStackTrace();
+		}
+		return employeePayrollList;
+	}
+
+	// Get active employees from DB
+	public List<EmployeePayrollData> getActiveEmployeesData() throws DatabaseServiceException {
+		String query = "select * from employeepayroll e join companylist c on e.company_id = c.company_id where is_active=1";
+		return this.getEmployeePayrollDataUsingIsActive(query);
+	}
+	
+	// Passing query for active employees
+	private List<EmployeePayrollData> getEmployeePayrollDataUsingIsActive(String query) throws DatabaseServiceException {
+		List<EmployeePayrollData> employeePayrollList = null;
+		try (Connection connection = this.getConnection();) {
+			PreparedStatement prepareStatement = connection.prepareStatement(query);
+			ResultSet resultSet = prepareStatement.executeQuery(query);
+			employeePayrollList = this.getEmployeePayrollDataUsingIsActive(resultSet);
+		} catch (SQLException e) {
+			throw new DatabaseServiceException("Error in getting result set using is active");
+		}
+		return employeePayrollList;
+	}
+	
+	// Populating the object and returning list of employees
+	private List<EmployeePayrollData> getEmployeePayrollDataUsingIsActive(ResultSet resultSet) throws DatabaseServiceException {
+		List<EmployeePayrollData> employeePayrollList = new ArrayList<>();
+		try {
+			while (resultSet.next()) {
+				int id = resultSet.getInt("id");
+				int companyId = resultSet.getInt("company_id");
+				String companyName = resultSet.getString("company_name");
+				String name = resultSet.getString("name");
+				String gender = resultSet.getString("gender");
+				LocalDate start = resultSet.getDate("start").toLocalDate();
+				double salary = resultSet.getDouble("salary");
+				boolean is_active=resultSet.getBoolean("is_active");
+				employeePayrollList
+						.add(new EmployeePayrollData(id, name, gender, salary, start, companyName, companyId, is_active));
+			}
+		} catch (SQLException e) {
+			throw new DatabaseServiceException("Error in get values from result set using is active");
 		}
 		return employeePayrollList;
 	}

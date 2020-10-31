@@ -70,6 +70,13 @@ public class EmployeePayrollService {
 			this.employeePayrollList = employeePayrollNormaliseDBService.readData();
 		return employeePayrollList;
 	}
+	
+	// Reading data for active employees
+	public List<EmployeePayrollData> readEmployeePayrollDataForActiveEmployees(IOService ioService) throws DatabaseServiceException {
+		if (ioService.equals(IOService.DB_IO))
+			this.employeePayrollList = employeePayrollNormaliseDBService.getActiveEmployeesData();
+		return employeePayrollList;
+	}
 
 	// Reading employee data for date range
 	public List<EmployeePayrollData> readEmployeePayrollDataForDateRange(IOService ioService, LocalDate start,
@@ -115,11 +122,13 @@ public class EmployeePayrollService {
 
 	// Returning employee payroll data object
 	private EmployeePayrollData getEmployeePayrollData(String name) {
-		return this.employeePayrollList.stream().filter(employeePayrollDataItem -> employeePayrollDataItem.name.equals(name)).findFirst().orElse(null);
+		return this.employeePayrollList.stream()
+				.filter(employeePayrollDataItem -> employeePayrollDataItem.name.equals(name)).findFirst().orElse(null);
 	}
 
 	public boolean checkEmployeePayrollSyncWithDB(String name) {
-		List<EmployeePayrollData> employeePayrollDataList = employeePayrollNormaliseDBService.getEmployeePayrollData(name);
+		List<EmployeePayrollData> employeePayrollDataList = employeePayrollNormaliseDBService
+				.getEmployeePayrollData(name);
 		return employeePayrollDataList.get(0).equals(getEmployeePayrollData(name));
 	}
 

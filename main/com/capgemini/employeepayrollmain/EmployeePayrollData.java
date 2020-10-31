@@ -14,6 +14,7 @@ public class EmployeePayrollData {
 	public String department[];
 	private String departmentName;
 	private int departmentId;
+	private boolean isActive;
 
 	// Parameterized constructor to initialize instance members
 	public EmployeePayrollData(int id, String name, double salary) {
@@ -59,6 +60,12 @@ public class EmployeePayrollData {
 	public EmployeePayrollData(String companyName, int companyId) {
 		this.companyName = companyName;
 		this.companyId = companyId;
+	}
+
+	public EmployeePayrollData(int id, String name, String gender, double salary, LocalDate start,
+			String companyName, int companyId, boolean isActive) {
+		this(id,name,gender,salary,start,companyId,companyName);
+		this.isActive = isActive;
 	}
 
 	@Override

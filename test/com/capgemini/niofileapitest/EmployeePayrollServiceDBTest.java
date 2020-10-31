@@ -58,8 +58,17 @@ public class EmployeePayrollServiceDBTest {
 	public void testAddEmployeeToDatabase() throws DatabaseServiceException {
 		EmployeePayrollService employeePayrollService = new EmployeePayrollService();
 		employeePayrollService.readEmployeePayrollData(IOService.DB_IO);
-		employeePayrollService.addEmployeeToPayroll("Mark", "M", 5000000.00, LocalDate.now(), 106, "Dep4", 1004,"Company4");
+		//employeePayrollService.addEmployeeToPayroll("Mark", "M", 5000000.00, LocalDate.now(), 106, "Dep4", 1004, "Company4");
 		boolean result = employeePayrollService.checkEmployeePayrollSyncWithDB("Mark");
 		Assert.assertTrue(result);
+	}
+
+	// Removing employee from DB
+	@Test
+	public void testRemoveEmployeeFromPayroll() throws DatabaseServiceException {
+		EmployeePayrollService employeePayrollService = new EmployeePayrollService();
+		employeePayrollService.readEmployeePayrollData(IOService.DB_IO);
+		List<EmployeePayrollData> employeePayrollData = employeePayrollService.readEmployeePayrollDataForActiveEmployees(IOService.DB_IO);
+		Assert.assertEquals(3, employeePayrollData.size());
 	}
 }
