@@ -105,7 +105,7 @@ public class EmployeePayrollDBService {
 			double tax = taxablePay * 0.1;
 			double netPay = salary - tax;
 			String query = String.format(
-					"INSERT INTO payrolldetails(employee_id,basic_pay,deductions,taxable_pay,tax ,net_pay)VALUES (%s,%s,%s,%s,%s,%s)",
+					"insert into payrolldetails(employee_id,basic_pay,deductions,taxable_pay,tax ,net_pay) values (%s,%s,%s,%s,%s,%s)",
 					employeeId, salary, deductions, taxablePay, tax, netPay);
 			int rowAffected = statement.executeUpdate(query);
 			if (rowAffected == 1) {
