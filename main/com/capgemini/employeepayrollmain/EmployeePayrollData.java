@@ -12,6 +12,8 @@ public class EmployeePayrollData {
 	public String companyName;
 	public int companyId;
 	public String department[];
+	private String departmentName;
+	private int departmentId;
 
 	// Parameterized constructor to initialize instance members
 	public EmployeePayrollData(int id, String name, double salary) {
@@ -38,14 +40,25 @@ public class EmployeePayrollData {
 		this.department = department;
 	}
 
-	public EmployeePayrollData(int id, String name, String gender, double salary, LocalDate start, String companyName, int companyId) {
-		this.id = id;
-		this.name = name;
-		this.gender = gender;
+	public EmployeePayrollData(int id, String name, String gender, double salary, LocalDate start, int companyId, String companyName) {
+		this(id,name,gender,salary,start);
 		this.companyId = companyId;
 		this.companyName = companyName;
-		this.salary = salary;
-		this.start = start;
+		}
+
+	public EmployeePayrollData(int departmentId, String departmentName) {
+		this.departmentId = departmentId;
+		this.departmentName = departmentName;
+	}
+
+	public EmployeePayrollData(int employeeId, int departmentId2) {
+		this.id = employeeId;
+		this.departmentId = departmentId;
+	}
+
+	public EmployeePayrollData(String companyName, int companyId) {
+		this.companyName = companyName;
+		this.companyId = companyId;
 	}
 
 	@Override

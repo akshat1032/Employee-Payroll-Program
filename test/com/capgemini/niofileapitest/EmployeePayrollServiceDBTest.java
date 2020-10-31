@@ -13,7 +13,7 @@ import main.com.capgemini.employeepayrollmain.DatabaseServiceException;
 import main.com.capgemini.employeepayrollmain.EmployeePayrollData;
 
 public class EmployeePayrollServiceDBTest {
-	
+
 	// Test employee count in database
 	@Test
 	public void testNormalisedDBReadEmployeeData() {
@@ -21,7 +21,7 @@ public class EmployeePayrollServiceDBTest {
 		List<EmployeePayrollData> employeePayrollData = employeePayrollService.readEmployeePayrollData(IOService.DB_IO);
 		Assert.assertEquals(4, employeePayrollData.size());
 	}
-	
+
 	// Test update salary
 	@Test
 	public void testNormaliseDBUpdateSalary() {
@@ -39,16 +39,27 @@ public class EmployeePayrollServiceDBTest {
 		employeePayrollService.readEmployeePayrollData(IOService.DB_IO);
 		LocalDate start = LocalDate.of(2018, 01, 01);
 		LocalDate end = LocalDate.now();
-		List<EmployeePayrollData> employeePayrollData = employeePayrollService.readEmployeePayrollDataForDateRange(IOService.DB_IO, start, end);
+		List<EmployeePayrollData> employeePayrollData = employeePayrollService
+				.readEmployeePayrollDataForDateRange(IOService.DB_IO, start, end);
 		Assert.assertEquals(3, employeePayrollData.size());
 	}
-	
+
 	// Get average salary for employee
 	@Test
-	public void givenEmployeePayrollData_ShouldMatchAverageSalary_GroupByGender() throws DatabaseServiceException {
+	public void testAverageSalaryByGenderNormaliseDB() throws DatabaseServiceException {
 		EmployeePayrollService employeePayrollService = new EmployeePayrollService();
 		Map<String, Double> employeePayrollData = employeePayrollService.readAverageSalaryByGender(IOService.DB_IO);
-		Assert.assertTrue(employeePayrollData.get("M").equals(150000.00) &&
-				employeePayrollData.get("F").equals(3000000.00));
+		Assert.assertTrue(
+				employeePayrollData.get("M").equals(150000.00) && employeePayrollData.get("F").equals(3000000.00));
+	}
+
+	// Inserting employee to DB
+	@Test
+	public void testAddEmployeeToDatabase() throws DatabaseServiceException {
+		EmployeePayrollService employeePayrollService = new EmployeePayrollService();
+		employeePayrollService.readEmployeePayrollData(IOService.DB_IO);
+		employeePayrollService.addEmployeeToPayroll("Mark", "M", 5000000.00, LocalDate.now(), 106, "Dep4", 1004,"Company4");
+		boolean result = employeePayrollService.checkEmployeePayrollSyncWithDB("Mark");
+		Assert.assertTrue(result);
 	}
 }

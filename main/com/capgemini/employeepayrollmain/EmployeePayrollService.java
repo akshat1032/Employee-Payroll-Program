@@ -72,9 +72,10 @@ public class EmployeePayrollService {
 	}
 
 	// Reading employee data for date range
-	public List<EmployeePayrollData> readEmployeePayrollDataForDateRange(IOService ioService, LocalDate start, LocalDate end) {
+	public List<EmployeePayrollData> readEmployeePayrollDataForDateRange(IOService ioService, LocalDate start,
+			LocalDate end) {
 		if (ioService.equals(IOService.DB_IO))
-				return employeePayrollNormaliseDBService.getEmployeeForDateRange(start, end);
+			return employeePayrollNormaliseDBService.getEmployeeForDateRange(start, end);
 		return null;
 	}
 
@@ -88,10 +89,18 @@ public class EmployeePayrollService {
 			}
 		return null;
 	}
-	
+
 	// Inserting employee to database
 	public void addEmployeeToDatabase(String name, String gender, double salary, LocalDate start) {
-		employeePayrollList.add(employeePayrollDBService.addEmployeeToDatabaseWithPayrollDetails(name, gender, salary, start));
+		employeePayrollList
+				.add(employeePayrollDBService.addEmployeeToDatabaseWithPayrollDetails(name, gender, salary, start));
+	}
+
+	// Inserting record to multiple tables in database
+	public void addEmployeeToPayroll(String name, String gender, double salary, LocalDate start, int departmentId,
+			String departmentName, int companyId, String companyName) throws DatabaseServiceException {
+		employeePayrollList.add(employeePayrollNormaliseDBService.addEmployeeToDatabase(name, gender, salary, start,
+				departmentId, departmentName, companyId, companyName));
 	}
 
 	// Updating the data
@@ -106,15 +115,14 @@ public class EmployeePayrollService {
 
 	// Returning employee payroll data object
 	private EmployeePayrollData getEmployeePayrollData(String name) {
-		return this.employeePayrollList.stream()
-				.filter(employeePayrollDataItem -> employeePayrollDataItem.name.equals(name)).findFirst().orElse(null);
+		return this.employeePayrollList.stream().filter(employeePayrollDataItem -> employeePayrollDataItem.name.equals(name)).findFirst().orElse(null);
 	}
 
 	public boolean checkEmployeePayrollSyncWithDB(String name) {
 		List<EmployeePayrollData> employeePayrollDataList = employeePayrollNormaliseDBService.getEmployeePayrollData(name);
 		return employeePayrollDataList.get(0).equals(getEmployeePayrollData(name));
 	}
-	
+
 	public static void main(String[] args) {
 
 		// Welcome message added
