@@ -78,7 +78,7 @@ public class EmployeePayrollService {
 			this.employeePayrollList = employeePayrollDBService.readData();
 		return employeePayrollList;
 	}
-	
+
 	// Reading employee data for date range
 	public List<EmployeePayrollData> readEmployeePayrollDataForDateRange(IOService ioService, LocalDate start,
 			LocalDate end) throws DatabaseServiceException {
@@ -90,16 +90,21 @@ public class EmployeePayrollService {
 			}
 		return null;
 	}
-	
+
 	// Reading average salary from database
 	public Map<String, Double> readAverageSalaryByGender(IOService ioService) throws DatabaseServiceException {
-		if(ioService.equals(IOService.DB_IO))
+		if (ioService.equals(IOService.DB_IO))
 			try {
 				return employeePayrollDBService.getAverageSalaryByGender();
 			} catch (DatabaseServiceException e) {
 				e.printStackTrace();
 			}
 		return null;
+	}
+	
+	// Inserting employee to database
+	public void addEmployeeToDatabase(String name, String gender, double salary, LocalDate start) {
+		employeePayrollList.add(employeePayrollDBService.addEmployeeToDatabase(name, gender, salary, start));
 	}
 
 	// Updating the data

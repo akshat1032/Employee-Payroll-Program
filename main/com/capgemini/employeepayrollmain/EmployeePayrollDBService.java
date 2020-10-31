@@ -53,6 +53,28 @@ public class EmployeePayrollDBService {
 		return employeePayrollList;
 	}
 
+	// Adding employee to database
+	public EmployeePayrollData addEmployeeToDatabase(String name, String gender, double salary, LocalDate start) {
+		int employeeId = -1;
+		EmployeePayrollData employeePayrollData = null;
+		String query = String.format(
+				"insert into employeepayroll(name,gender,salary,start) VALUES ('%s','%s','%s','%s')", name, gender,
+				salary, Date.valueOf(start));
+		try (Connection connection = this.getConnection();) {
+			PreparedStatement prepareStatement = connection.prepareStatement(query);
+			int rowsAffected = prepareStatement.executeUpdate(query, Statement.RETURN_GENERATED_KEYS);
+			if (rowsAffected == 1) {
+				ResultSet resultSet = prepareStatement.getGeneratedKeys();
+				if (resultSet.next())
+					employeeId = resultSet.getInt(1);
+			}
+			employeePayrollData = new EmployeePayrollData(employeeId, name, salary, start);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return employeePayrollData;
+	}
+
 	// Update employee data
 	public int updateEmployeeData(String name, double salary) {
 		return this.updateDataUsingPreparedStatement(name, salary);

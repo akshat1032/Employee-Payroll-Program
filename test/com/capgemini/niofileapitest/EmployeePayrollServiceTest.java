@@ -66,4 +66,14 @@ public class EmployeePayrollServiceTest {
 		Assert.assertTrue(averageSalaryByGender.get("M").equals(150000.00) &&
 				averageSalaryByGender.get("F").equals(300000.00));
 	}
+	
+	// Testing to check sync with database after adding new employee
+	@Test
+	public void testAddNewEmployee() throws DatabaseServiceException {
+		EmployeePayrollService employeePayrollService = new EmployeePayrollService();
+		employeePayrollService.readEmployeePayrollData(IOService.DB_IO);
+		employeePayrollService.addEmployeeToDatabase("Mark", "M", 500000.00, LocalDate.now());
+		boolean result = employeePayrollService.checkEmployeePayrollSyncWithDB("Mark");
+		Assert.assertTrue(result);
+	}
 }
