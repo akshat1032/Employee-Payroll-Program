@@ -82,7 +82,7 @@ public class EmployeePayrollService {
 	public Map<String, Double> readAverageSalaryByGender(IOService ioService) throws DatabaseServiceException {
 		if (ioService.equals(IOService.DB_IO))
 			try {
-				return employeePayrollDBService.getAverageSalaryByGender();
+				return employeePayrollNormaliseDBService.getAverageSalaryByGender();
 			} catch (DatabaseServiceException e) {
 				e.printStackTrace();
 			}

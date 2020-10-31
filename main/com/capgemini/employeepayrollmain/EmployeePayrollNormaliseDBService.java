@@ -3,7 +3,9 @@ package main.com.capgemini.employeepayrollmain;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 public class EmployeePayrollNormaliseDBService {
@@ -90,6 +92,25 @@ public class EmployeePayrollNormaliseDBService {
 	public List<EmployeePayrollData> getEmployeeForDateRange(LocalDate start, LocalDate end) {
 		String query = String.format("select * from employeepayroll e join companylist c on e.company_id = c.company_id where start between '%s' and '%s';", Date.valueOf(start), Date.valueOf(end));
 		return this.getEmployeePayrollDataUsingDB(query);
+	}
+	
+	// Get average salary by gender
+	public Map<String, Double> getAverageSalaryByGender() throws DatabaseServiceException {
+		String query = "SELECT gender,avg(basic_pay) as avg_salary from employeepayroll e join payrolldetails p"
+				+" on e.id = p.employee_id group by gender;";
+		Map<String, Double> genderToAverageSalaryMap = new HashMap<>();
+		try (Connection connection = this.getConnection();) {
+			PreparedStatement prepareStatement = connection.prepareStatement(query);
+			ResultSet resultSet = prepareStatement.executeQuery(query);
+			while (resultSet.next()) {
+				String gender = resultSet.getString("gender");
+				double salary = resultSet.getDouble("avg_salary");
+				genderToAverageSalaryMap.put(gender, salary);
+			}
+		} catch (SQLException e) {
+			throw new DatabaseServiceException("Cannot get average salary");
+		}
+		return genderToAverageSalaryMap;
 	}
 
 	// Retrieving data using database
