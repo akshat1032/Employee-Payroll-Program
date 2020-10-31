@@ -15,27 +15,18 @@ public class EmployeePayrollService {
 
 	private List<EmployeePayrollData> employeePayrollList;
 	private EmployeePayrollDBService employeePayrollDBService;
+	private EmployeePayrollNormaliseDBService employeePayrollNormaliseDBService;
 	static Logger log = Logger.getLogger(EmployeePayrollService.class.getName());
 
 	public EmployeePayrollService() {
 		employeePayrollDBService = EmployeePayrollDBService.getInstance();
+		employeePayrollNormaliseDBService = EmployeePayrollNormaliseDBService.getInstance();
 	}
 
 	// Initializing the field which stores employee payroll details
 	public EmployeePayrollService(List<EmployeePayrollData> employeePayrollList) {
 		this();
 		this.employeePayrollList = employeePayrollList;
-	}
-
-	public static void main(String[] args) {
-
-		// Welcome message added
-		log.info("Welcome to Employee Payroll Program");
-		ArrayList<EmployeePayrollData> employeePayrollList = new ArrayList<>();
-		EmployeePayrollService employeePayrollService = new EmployeePayrollService(employeePayrollList);
-		Scanner consoleInputReader = new Scanner(System.in);
-		employeePayrollService.readEmployeePayrollData(consoleInputReader);
-		employeePayrollService.writeEmployeePayrollData(IOService.FILE_IO);
 	}
 
 	// Taking details for employee from console
@@ -71,11 +62,11 @@ public class EmployeePayrollService {
 	}
 
 	// Reading employee payroll data from file
-	public List<EmployeePayrollData> readEmployeePayrollData(IOService ioService) throws DatabaseServiceException {
+	public List<EmployeePayrollData> readEmployeePayrollData(IOService ioService) {
 		if (ioService.equals(IOService.FILE_IO))
 			this.employeePayrollList = new EmployeePayrollFileIOService().readData();
 		if (ioService.equals(IOService.DB_IO))
-			this.employeePayrollList = employeePayrollDBService.readData();
+			this.employeePayrollList = employeePayrollNormaliseDBService.readData();
 		return employeePayrollList;
 	}
 
@@ -109,7 +100,7 @@ public class EmployeePayrollService {
 
 	// Updating the data
 	public void updateEmployeeSalary(String name, double salary) {
-		int result = employeePayrollDBService.updateEmployeeData(name, salary);
+		int result = employeePayrollNormaliseDBService.updateEmployeeData(name, salary);
 		if (result == 0)
 			return;
 		EmployeePayrollData employeePayrollData = this.getEmployeePayrollData(name);
@@ -124,7 +115,18 @@ public class EmployeePayrollService {
 	}
 
 	public boolean checkEmployeePayrollSyncWithDB(String name) {
-		List<EmployeePayrollData> employeePayrollDataList = employeePayrollDBService.getEmployeePayrollData(name);
+		List<EmployeePayrollData> employeePayrollDataList = employeePayrollNormaliseDBService.getEmployeePayrollData(name);
 		return employeePayrollDataList.get(0).equals(getEmployeePayrollData(name));
+	}
+	
+	public static void main(String[] args) {
+
+		// Welcome message added
+		log.info("Welcome to Employee Payroll Program");
+		ArrayList<EmployeePayrollData> employeePayrollList = new ArrayList<>();
+		EmployeePayrollService employeePayrollService = new EmployeePayrollService(employeePayrollList);
+		Scanner consoleInputReader = new Scanner(System.in);
+		employeePayrollService.readEmployeePayrollData(consoleInputReader);
+		employeePayrollService.writeEmployeePayrollData(IOService.FILE_IO);
 	}
 }
