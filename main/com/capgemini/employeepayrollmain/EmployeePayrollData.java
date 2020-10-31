@@ -47,25 +47,22 @@ public class EmployeePayrollData {
 		this.companyName = companyName;
 		}
 
-	public EmployeePayrollData(int departmentId, String departmentName) {
-		this.departmentId = departmentId;
-		this.departmentName = departmentName;
-	}
-
-	public EmployeePayrollData(int employeeId, int departmentId2) {
+	public EmployeePayrollData(int employeeId, int departmentId) {
 		this.id = employeeId;
 		this.departmentId = departmentId;
-	}
-
-	public EmployeePayrollData(String companyName, int companyId) {
-		this.companyName = companyName;
-		this.companyId = companyId;
 	}
 
 	public EmployeePayrollData(int id, String name, String gender, double salary, LocalDate start,
 			String companyName, int companyId, boolean isActive) {
 		this(id,name,gender,salary,start,companyId,companyName);
 		this.isActive = isActive;
+	}
+
+	public EmployeePayrollData(int employeeId, String name, String gender, double salary, LocalDate start, int departmentId,
+			String departmentName, int companyId, String companyName) {
+		this(employeeId,name,gender,salary,start,companyId,companyName);
+		this.departmentId = departmentId;
+		this.departmentName = departmentName;
 	}
 
 	@Override

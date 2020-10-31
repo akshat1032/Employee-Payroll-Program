@@ -49,8 +49,7 @@ public class EmployeePayrollServiceDBTest {
 	public void testAverageSalaryByGenderNormaliseDB() throws DatabaseServiceException {
 		EmployeePayrollService employeePayrollService = new EmployeePayrollService();
 		Map<String, Double> employeePayrollData = employeePayrollService.readAverageSalaryByGender(IOService.DB_IO);
-		Assert.assertTrue(
-				employeePayrollData.get("M").equals(150000.00) && employeePayrollData.get("F").equals(3000000.00));
+		Assert.assertTrue(employeePayrollData.get("M").equals(150000.00) && employeePayrollData.get("F").equals(3000000.00));
 	}
 
 	// Inserting employee to DB
@@ -58,7 +57,7 @@ public class EmployeePayrollServiceDBTest {
 	public void testAddEmployeeToDatabase() throws DatabaseServiceException {
 		EmployeePayrollService employeePayrollService = new EmployeePayrollService();
 		employeePayrollService.readEmployeePayrollData(IOService.DB_IO);
-		//employeePayrollService.addEmployeeToPayroll("Mark", "M", 5000000.00, LocalDate.now(), 106, "Dep4", 1004, "Company4");
+		employeePayrollService.addEmployeeToPayroll("Mark", "M", 5000000.00, LocalDate.now(), 106, "Dep4", 1004, "Company4");
 		boolean result = employeePayrollService.checkEmployeePayrollSyncWithDB("Mark");
 		Assert.assertTrue(result);
 	}

@@ -39,7 +39,7 @@ public class EmployeePayrollNormaliseDBService {
 			throws DatabaseServiceException {
 		int employeeId = -1;
 		Connection connection = null;
-		EmployeePayrollData employeePayrollData = null;
+//		EmployeePayrollData employeePayrollData = null;
 		try {
 			connection = this.getConnection();
 			connection.setAutoCommit(false);
@@ -50,10 +50,7 @@ public class EmployeePayrollNormaliseDBService {
 		try {
 			Statement statement = connection.createStatement();
 			String query = String.format("insert into companylist values ('%s','%s');", companyId, companyName);
-			int rowsAffected = statement.executeUpdate(query);
-			if (rowsAffected == 1) {
-				employeePayrollData = new EmployeePayrollData(companyName, companyId);
-			}
+			statement.executeUpdate(query);
 		} catch (SQLException e) {
 			e.printStackTrace();
 			try {
@@ -61,7 +58,6 @@ public class EmployeePayrollNormaliseDBService {
 			} catch (SQLException e2) {
 				throw new DatabaseServiceException("Error in inserting record to CompanyList table");
 			}
-			return employeePayrollData;
 		}
 
 		try {
@@ -75,8 +71,6 @@ public class EmployeePayrollNormaliseDBService {
 				if (resultSet.next())
 					employeeId = resultSet.getInt(1);
 			}
-			employeePayrollData = new EmployeePayrollData(employeeId, name, gender, salary, start, companyId,
-					companyName);
 		} catch (SQLException e) {
 			e.printStackTrace();
 			try {
@@ -84,7 +78,6 @@ public class EmployeePayrollNormaliseDBService {
 			} catch (SQLException e1) {
 				throw new DatabaseServiceException("Error in inserting record to Employee Payroll table");
 			}
-			return employeePayrollData;
 		}
 
 		try {
@@ -96,10 +89,7 @@ public class EmployeePayrollNormaliseDBService {
 			String query = String.format(
 					"insert into payrolldetails(employee_id,basic_pay,deductions,taxable_pay,tax ,net_pay)VALUES ('%s','%s','%s','%s','%s','%s');",
 					employeeId, salary, deductions, taxablePay, tax, netPay);
-			int rowsAffected = statement.executeUpdate(query);
-			if (rowsAffected == 1) {
-				employeePayrollData = new EmployeePayrollData(employeeId, name, salary, start);
-			}
+			statement.executeUpdate(query);
 		} catch (SQLException e) {
 			e.printStackTrace();
 			try {
@@ -107,18 +97,13 @@ public class EmployeePayrollNormaliseDBService {
 			} catch (SQLException e3) {
 				throw new DatabaseServiceException("Error in inserting record to PayrollDetails table");
 			}
-			System.out.println(employeePayrollData);
-			return employeePayrollData;
 		}
 		try {
 			Statement statement = connection.createStatement();
 			String query = String.format(
 					"insert into departmentlist(Department_ID,Department_Name) VALUES ('%s','%s');", departmentId,
 					departmentName);
-			int rowsAffected = statement.executeUpdate(query);
-			if (rowsAffected == 1) {
-				employeePayrollData = new EmployeePayrollData(departmentId, departmentName);
-			}
+			statement.executeUpdate(query);
 		} catch (SQLException e) {
 			e.printStackTrace();
 			try {
@@ -126,17 +111,13 @@ public class EmployeePayrollNormaliseDBService {
 			} catch (SQLException e4) {
 				throw new DatabaseServiceException("Error in inserting record to DepartmentList table");
 			}
-			return employeePayrollData;
 		}
 		try {
 			Statement statement = connection.createStatement();
 			String query = String.format(
 					"insert into employeedepartmentlist(employee_id,department_id) VALUES ('%s','%s');", employeeId,
 					departmentId);
-			int rowsAffected = statement.executeUpdate(query);
-			if (rowsAffected == 1) {
-				employeePayrollData = new EmployeePayrollData(employeeId, departmentId);
-			}
+			statement.executeUpdate(query);
 		} catch (SQLException e) {
 			e.printStackTrace();
 			try {
@@ -144,7 +125,6 @@ public class EmployeePayrollNormaliseDBService {
 			} catch (SQLException e5) {
 				throw new DatabaseServiceException("Error in inserting record to EmployeeDepartmentList table");
 			}
-			return employeePayrollData;
 		}
 		try {
 			connection.commit();
@@ -158,8 +138,9 @@ public class EmployeePayrollNormaliseDBService {
 					e.printStackTrace();
 				}
 			}
-			return employeePayrollData;
 		}
+		return new EmployeePayrollData(employeeId, name, gender, salary, start, departmentId, departmentName, companyId,
+				companyName);
 	}
 
 	// Get data from database by query
@@ -222,9 +203,10 @@ public class EmployeePayrollNormaliseDBService {
 		String query = "select * from employeepayroll e join companylist c on e.company_id = c.company_id where is_active=1";
 		return this.getEmployeePayrollDataUsingIsActive(query);
 	}
-	
+
 	// Passing query for active employees
-	private List<EmployeePayrollData> getEmployeePayrollDataUsingIsActive(String query) throws DatabaseServiceException {
+	private List<EmployeePayrollData> getEmployeePayrollDataUsingIsActive(String query)
+			throws DatabaseServiceException {
 		List<EmployeePayrollData> employeePayrollList = null;
 		try (Connection connection = this.getConnection();) {
 			PreparedStatement prepareStatement = connection.prepareStatement(query);
@@ -235,9 +217,10 @@ public class EmployeePayrollNormaliseDBService {
 		}
 		return employeePayrollList;
 	}
-	
+
 	// Populating the object and returning list of employees
-	private List<EmployeePayrollData> getEmployeePayrollDataUsingIsActive(ResultSet resultSet) throws DatabaseServiceException {
+	private List<EmployeePayrollData> getEmployeePayrollDataUsingIsActive(ResultSet resultSet)
+			throws DatabaseServiceException {
 		List<EmployeePayrollData> employeePayrollList = new ArrayList<>();
 		try {
 			while (resultSet.next()) {
@@ -248,9 +231,9 @@ public class EmployeePayrollNormaliseDBService {
 				String gender = resultSet.getString("gender");
 				LocalDate start = resultSet.getDate("start").toLocalDate();
 				double salary = resultSet.getDouble("salary");
-				boolean is_active=resultSet.getBoolean("is_active");
-				employeePayrollList
-						.add(new EmployeePayrollData(id, name, gender, salary, start, companyName, companyId, is_active));
+				boolean is_active = resultSet.getBoolean("is_active");
+				employeePayrollList.add(
+						new EmployeePayrollData(id, name, gender, salary, start, companyName, companyId, is_active));
 			}
 		} catch (SQLException e) {
 			throw new DatabaseServiceException("Error in get values from result set using is active");

@@ -122,13 +122,11 @@ public class EmployeePayrollService {
 
 	// Returning employee payroll data object
 	private EmployeePayrollData getEmployeePayrollData(String name) {
-		return this.employeePayrollList.stream()
-				.filter(employeePayrollDataItem -> employeePayrollDataItem.name.equals(name)).findFirst().orElse(null);
+		return this.employeePayrollList.stream().filter(employeePayrollDataItem -> employeePayrollDataItem.name.equals(name)).findFirst().orElse(null);
 	}
 
 	public boolean checkEmployeePayrollSyncWithDB(String name) {
-		List<EmployeePayrollData> employeePayrollDataList = employeePayrollNormaliseDBService
-				.getEmployeePayrollData(name);
+		List<EmployeePayrollData> employeePayrollDataList = employeePayrollNormaliseDBService.getEmployeePayrollData(name);
 		return employeePayrollDataList.get(0).equals(getEmployeePayrollData(name));
 	}
 
