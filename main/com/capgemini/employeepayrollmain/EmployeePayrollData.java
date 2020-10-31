@@ -29,13 +29,23 @@ public class EmployeePayrollData {
 		this(id, name, salary, start);
 		this.gender = gender;
 	}
-
+	
 	public EmployeePayrollData(int id, String name, String gender, double salary, LocalDate start, String companyName,
 			int companyId, String[] department) {
 		this(id, name, gender, salary, start);
 		this.companyName = companyName;
 		this.companyId = companyId;
 		this.department = department;
+	}
+
+	public EmployeePayrollData(int id, String name, String gender, double salary, LocalDate start, String companyName, int companyId) {
+		this.id = id;
+		this.name = name;
+		this.gender = gender;
+		this.companyId = companyId;
+		this.companyName = companyName;
+		this.salary = salary;
+		this.start = start;
 	}
 
 	@Override

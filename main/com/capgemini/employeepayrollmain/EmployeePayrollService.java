@@ -1,5 +1,6 @@
 package main.com.capgemini.employeepayrollmain;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -71,14 +72,9 @@ public class EmployeePayrollService {
 	}
 
 	// Reading employee data for date range
-	public List<EmployeePayrollData> readEmployeePayrollDataForDateRange(IOService ioService, LocalDate start,
-			LocalDate end) throws DatabaseServiceException {
+	public List<EmployeePayrollData> readEmployeePayrollDataForDateRange(IOService ioService, LocalDate start, LocalDate end) {
 		if (ioService.equals(IOService.DB_IO))
-			try {
-				return employeePayrollDBService.getEmployeeForDateRange(start, end);
-			} catch (DatabaseServiceException e) {
-				e.printStackTrace();
-			}
+				return employeePayrollNormaliseDBService.getEmployeeForDateRange(start, end);
 		return null;
 	}
 
