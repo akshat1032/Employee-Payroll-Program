@@ -39,7 +39,6 @@ public class EmployeePayrollNormaliseDBService {
 			throws DatabaseServiceException {
 		int employeeId = -1;
 		Connection connection = null;
-//		EmployeePayrollData employeePayrollData = null;
 		try {
 			connection = this.getConnection();
 			connection.setAutoCommit(false);
