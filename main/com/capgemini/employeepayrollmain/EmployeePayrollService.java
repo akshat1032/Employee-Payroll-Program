@@ -3,6 +3,7 @@ package main.com.capgemini.employeepayrollmain;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -110,6 +111,7 @@ public class EmployeePayrollService {
 				departmentId, departmentName, companyId, companyName));
 	}
 	
+	// Adding employee to payroll without using thread
 	public void addEmployeeToPayroll(List<EmployeePayrollData> employeeList) throws DatabaseServiceException{
 		employeeList.forEach(employeePayrollData ->{
 			log.info("Employee being added : "+employeePayrollData.name);
@@ -119,6 +121,27 @@ public class EmployeePayrollService {
 		log.info(""+this.employeePayrollList);
 	}
 
+	// Adding employee to payroll using thread
+	public void addEmployeeToPayrollWithThreads(List<EmployeePayrollData> employeeList) {
+		Map<Integer,Boolean> employeeAdditionStatus = new HashMap<>();
+		employeeList.forEach(employeePayrollData -> {
+			Runnable task = () -> {
+				employeeAdditionStatus.put(employeePayrollData.hashCode(), false);
+				log.info("Employee being added : "+Thread.currentThread().getName());
+				this.addEmployeeToDatabase(employeePayrollData.name, employeePayrollData.gender, employeePayrollData.salary, employeePayrollData.start);
+				employeeAdditionStatus.put(employeePayrollData.hashCode(), true);
+				log.info("Employee added : "+Thread.currentThread().getName());
+				};
+				Thread thread = new Thread(task, employeePayrollData.name);
+				thread.start();
+		});
+		while (employeeAdditionStatus.containsValue(false)) {
+			try {
+				Thread.sleep(10);
+			}catch(InterruptedException e) {}
+			log.info("\n"+this.employeePayrollList);
+		}
+	}
 	// Updating the data
 	public void updateEmployeeSalary(String name, double salary) {
 		int result = employeePayrollNormaliseDBService.updateEmployeeData(name, salary);

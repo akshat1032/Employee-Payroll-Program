@@ -48,8 +48,20 @@ public class EmployeePayrollNormaliseDBService {
 
 		try {
 			Statement statement = connection.createStatement();
-			String query = String.format("insert into companylist values ('%s','%s');", companyId, companyName);
-			statement.executeUpdate(query);
+			ResultSet company = statement.executeQuery("select * from companylist");
+			List<Integer> companyIdList = new ArrayList<>();
+			while (company.next()) {
+				companyIdList.add(company.getInt("company_id"));
+			}
+			int companyCounter = 0;
+			for (Integer integer : companyIdList) {
+				if (integer == companyId)
+					companyCounter++;
+			}
+			if (companyCounter == 0) {
+				String query = String.format("insert into companylist values ('%s','%s');", companyId, companyName);
+				statement.executeUpdate(query);
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 			try {
@@ -99,10 +111,22 @@ public class EmployeePayrollNormaliseDBService {
 		}
 		try {
 			Statement statement = connection.createStatement();
-			String query = String.format(
-					"insert into departmentlist(Department_ID,Department_Name) VALUES ('%s','%s');", departmentId,
-					departmentName);
-			statement.executeUpdate(query);
+			ResultSet department = statement.executeQuery("select * from departmentlist");
+			List<Integer> departmentIdList = new ArrayList<>();
+			while (department.next()) {
+				departmentIdList.add(department.getInt("department_id"));
+			}
+			int departmentCounter = 0;
+			for (Integer integer : departmentIdList) {
+				if (integer.equals(departmentId))
+					departmentCounter++;
+			}
+			if (departmentCounter == 0) {
+				String query = String.format(
+						"insert into departmentlist(Department_ID,Department_Name) VALUES ('%s','%s');", departmentId,
+						departmentName);
+				statement.executeUpdate(query);
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 			try {
