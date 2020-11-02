@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 public class EmployeePayrollNormaliseDBService {
 
 	private static Logger log = Logger.getLogger(EmployeePayrollNormaliseDBService.class.getName());
+	private int connectionCounter = 0;
 	private static EmployeePayrollNormaliseDBService employeePayrollNormaliseDBService;
 	private PreparedStatement employeePayrollNormaliseDataStatement;
 
@@ -37,60 +38,103 @@ public class EmployeePayrollNormaliseDBService {
 	public EmployeePayrollData addEmployeeToDatabase(String name, String gender, double salary, LocalDate start,
 			int departmentId, String departmentName, int companyId, String companyName)
 			throws DatabaseServiceException {
-		int employeeId = -1;
-		Connection connection = null;
+		Connection connection[] = new Connection[1];
+		EmployeePayrollData[] employeePayrollData = new EmployeePayrollData[1];
+		Map<Integer, Boolean> payrollAdditionStatus = new HashMap<>();
 		try {
-			connection = this.getConnection();
-			connection.setAutoCommit(false);
-		} catch (SQLException e) {
-			throw new DatabaseServiceException("Error in establising connection for adding to database");
-		}
-
-		try {
-			Statement statement = connection.createStatement();
-			ResultSet company = statement.executeQuery("select * from companylist");
-			List<Integer> companyIdList = new ArrayList<>();
-			while (company.next()) {
-				companyIdList.add(company.getInt("company_id"));
-			}
-			int companyCounter = 0;
-			for (Integer integer : companyIdList) {
-				if (integer == companyId)
-					companyCounter++;
-			}
-			if (companyCounter == 0) {
-				String query = String.format("insert into companylist values ('%s','%s');", companyId, companyName);
-				statement.executeUpdate(query);
-			}
+			connection[0] = this.getConnection();
+			connection[0].setAutoCommit(false);
 		} catch (SQLException e) {
 			e.printStackTrace();
 			try {
-				connection.rollback();
-			} catch (SQLException e2) {
-				throw new DatabaseServiceException("Error in inserting record to CompanyList table");
+				connection[0].rollback();
+			} catch (SQLException e1) {
+				throw new DatabaseServiceException("Error in establishing connection to DB");
 			}
 		}
+		int comId = this.addToCompanyTable(connection[0], companyName, companyId);
+		int employeeId = this.addToEmployeePayrollTable(connection[0], name, gender, salary, start,comId);
+		int depId = this.addToDepartmentTable(connection[0], departmentName,departmentId);
+		
+		Runnable taskAddPayrollDetails = () -> {
+			payrollAdditionStatus.put(employeeId, false);
+			try {
+				boolean tableUpdated = this.addToPayrollDetailsTable(connection[0], employeeId, salary, name, start);
+				if (tableUpdated) {
+					employeePayrollData[0] = new EmployeePayrollData(employeeId, name, gender, salary, start);
+				}
+				payrollAdditionStatus.put(employeeId, tableUpdated);
+			} catch (DatabaseServiceException e) {
+			}
+		};
+		Thread thread = new Thread(taskAddPayrollDetails);
+		thread.start();
+		while (payrollAdditionStatus.containsValue(false)) {
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		Map<Integer,Boolean> employeeDeptAdditionStatus = new HashMap<>();
+		Runnable taskAddEmployeeDeptDetails = () -> {
+			payrollAdditionStatus.put(employeeId, false);
+			try {
+				boolean tableUpdated = this.addToEmployeeDepartmentTable(connection[0], employeeId, depId);
+				payrollAdditionStatus.put(employeeId, tableUpdated);
+			} catch (DatabaseServiceException e) {
+			}
+		};
+		Thread threadEmployeeDept = new Thread(taskAddEmployeeDeptDetails);
+		threadEmployeeDept.start();
+		while (employeeDeptAdditionStatus.containsValue(false)) {
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		try {
+			connection[0].commit();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			if (connection != null) {
+				try {
+					connection[0].close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return employeePayrollData[0];
+	}
 
+	// Adding to employee-department table
+	private boolean addToEmployeeDepartmentTable(Connection connection, int employeeId, int depId) throws DatabaseServiceException {
+		boolean isUpdated = false;
 		try {
 			Statement statement = connection.createStatement();
 			String query = String.format(
-					"insert into employeepayroll(name,gender,salary,start,company_id) VALUES ('%s','%s','%s','%s','%s');",
-					name, gender, salary, Date.valueOf(start), companyId);
-			int rowsAffected = statement.executeUpdate(query, Statement.RETURN_GENERATED_KEYS);
+					"insert into employeedepartmentlist(employee_id,department_id) VALUES ('%s','%s');", employeeId,
+					depId);
+			int rowsAffected = statement.executeUpdate(query);
 			if (rowsAffected == 1) {
-				ResultSet resultSet = statement.getGeneratedKeys();
-				if (resultSet.next())
-					employeeId = resultSet.getInt(1);
+				isUpdated = true;
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 			try {
 				connection.rollback();
-			} catch (SQLException e1) {
-				throw new DatabaseServiceException("Error in inserting record to Employee Payroll table");
+			} catch (SQLException e5) {
+				throw new DatabaseServiceException("Error in inserting record to EmployeeDepartmentList table");
 			}
 		}
+		return isUpdated;
+	}
 
+	private boolean addToPayrollDetailsTable(Connection connection, int employeeId, double salary, String name,
+			LocalDate start) throws DatabaseServiceException {
 		try {
 			Statement statement = connection.createStatement();
 			double deductions = salary * 0.2;
@@ -109,6 +153,11 @@ public class EmployeePayrollNormaliseDBService {
 				throw new DatabaseServiceException("Error in inserting record to PayrollDetails table");
 			}
 		}
+		return false;
+	}
+
+	// Adding to department table
+	private int addToDepartmentTable(Connection connection, String departmentName, int departmentId) throws DatabaseServiceException {
 		try {
 			Statement statement = connection.createStatement();
 			ResultSet department = statement.executeQuery("select * from departmentlist");
@@ -126,6 +175,7 @@ public class EmployeePayrollNormaliseDBService {
 						"insert into departmentlist(Department_ID,Department_Name) VALUES ('%s','%s');", departmentId,
 						departmentName);
 				statement.executeUpdate(query);
+				return departmentId;
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -135,35 +185,63 @@ public class EmployeePayrollNormaliseDBService {
 				throw new DatabaseServiceException("Error in inserting record to DepartmentList table");
 			}
 		}
+		return -1;
+	}
+
+	// Adding to employee payroll table
+	private int addToEmployeePayrollTable(Connection connection, String name, String gender, double salary,
+			LocalDate start, int comId) throws DatabaseServiceException {
+		int employeeId = -1;
 		try {
 			Statement statement = connection.createStatement();
 			String query = String.format(
-					"insert into employeedepartmentlist(employee_id,department_id) VALUES ('%s','%s');", employeeId,
-					departmentId);
-			statement.executeUpdate(query);
+					"insert into employeepayroll(name,gender,salary,start,company_id) VALUES ('%s','%s','%s','%s','%s');",
+					name, gender, salary, Date.valueOf(start), comId);
+			int rowsAffected = statement.executeUpdate(query, Statement.RETURN_GENERATED_KEYS);
+			if (rowsAffected == 1) {
+				ResultSet resultSet = statement.getGeneratedKeys();
+				if (resultSet.next())
+					employeeId = resultSet.getInt(1);
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 			try {
 				connection.rollback();
-			} catch (SQLException e5) {
-				throw new DatabaseServiceException("Error in inserting record to EmployeeDepartmentList table");
+			} catch (SQLException e1) {
+				throw new DatabaseServiceException("Error in inserting record to Employee Payroll table");
 			}
 		}
+		return employeeId;
+	}
+
+	// Adding to company table
+	private int addToCompanyTable(Connection connection, String companyName, int companyId) throws DatabaseServiceException {
 		try {
-			connection.commit();
+			Statement statement = connection.createStatement();
+			ResultSet company = statement.executeQuery("select * from companylist");
+			List<Integer> companyIdList = new ArrayList<>();
+			while (company.next()) {
+				companyIdList.add(company.getInt("company_id"));
+			}
+			int companyCounter = 0;
+			for (Integer integer : companyIdList) {
+				if (integer == companyId)
+					companyCounter++;
+			}
+			if (companyCounter == 0) {
+				String query = String.format("insert into companylist values ('%s','%s');", companyId, companyName);
+				statement.executeUpdate(query);
+				return companyId;
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-		} finally {
-			if (connection != null) {
-				try {
-					connection.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
+			try {
+				connection.rollback();
+			} catch (SQLException e2) {
+				throw new DatabaseServiceException("Error in inserting record to CompanyList table");
 			}
 		}
-		return new EmployeePayrollData(employeeId, name, gender, salary, start, departmentId, departmentName, companyId,
-				companyName);
+		return -1;
 	}
 
 	// Get data from database by query
@@ -360,7 +438,8 @@ public class EmployeePayrollNormaliseDBService {
 	}
 
 	// Establishing connection to database and returning connection object
-	private Connection getConnection() throws SQLException {
+	private synchronized Connection getConnection() throws SQLException {
+		connectionCounter++;
 		String jdbcURL = "jdbc:mysql://localhost:3306/payroll_service?useSSL=false";
 		String userName = "root";
 		String password = "123qwe";

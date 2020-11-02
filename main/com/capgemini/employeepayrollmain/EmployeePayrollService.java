@@ -99,7 +99,7 @@ public class EmployeePayrollService {
 	}
 
 	// Inserting employee to database
-	public void addEmployeeToDatabase(String name, String gender, double salary, LocalDate start) {
+	public void addEmployeeToDatabase(String name, String gender, double salary, LocalDate start) throws DatabaseServiceException {
 		employeePayrollList
 				.add(employeePayrollDBService.addEmployeeToDatabaseWithPayrollDetails(name, gender, salary, start));
 	}
@@ -114,7 +114,11 @@ public class EmployeePayrollService {
 	// Adding employee to payroll without using thread
 	public void addEmployeeToPayroll(List<EmployeePayrollData> employeeList) throws DatabaseServiceException{
 		employeeList.forEach(employeePayrollData ->{
-			this.addEmployeeToDatabase(employeePayrollData.name,employeePayrollData.gender, employeePayrollData.salary, employeePayrollData.start);
+			try {
+				this.addEmployeeToDatabase(employeePayrollData.name,employeePayrollData.gender, employeePayrollData.salary, employeePayrollData.start);
+			} catch (DatabaseServiceException e) {
+				e.printStackTrace();
+			}
 		});
 	}
 
@@ -124,7 +128,11 @@ public class EmployeePayrollService {
 		employeeList.forEach(employeePayrollData -> {
 			Runnable task = () -> {
 				employeeAdditionStatus.put(employeePayrollData.hashCode(), false);
-				this.addEmployeeToDatabase(employeePayrollData.name, employeePayrollData.gender, employeePayrollData.salary, employeePayrollData.start);
+				try {
+					this.addEmployeeToDatabase(employeePayrollData.name, employeePayrollData.gender, employeePayrollData.salary, employeePayrollData.start);
+				} catch (DatabaseServiceException e) {
+					e.printStackTrace();
+				}
 				employeeAdditionStatus.put(employeePayrollData.hashCode(), true);
 				};
 				Thread thread = new Thread(task, employeePayrollData.name);

@@ -75,16 +75,63 @@ public class EmployeePayrollDBService {
 		return employeePayrollData;
 	}
 
+	// Adding employee to DB
 	public EmployeePayrollData addEmployeeToDatabaseWithPayrollDetails(String name, String gender, double salary,
-			LocalDate start) {
-		int employeeId = -1;
-		Connection connection = null;
-		EmployeePayrollData employeePayrollData = null;
+			LocalDate start) throws DatabaseServiceException {
+		Connection connection[] = new Connection[1];
+		EmployeePayrollData[] employeePayrollData = new EmployeePayrollData[1];
+		Map<Integer, Boolean> payrollAdditionStatus = new HashMap<>();
 		try {
-			connection = this.getConnection();
+			connection[0] = this.getConnection();
+			connection[0].setAutoCommit(false);
 		} catch (SQLException e) {
 			e.printStackTrace();
+			try {
+				connection[0].rollback();
+			} catch (SQLException e1) {
+				throw new DatabaseServiceException("Error in establishing connection to DB");
+			}
 		}
+		int employeeId = this.addToEmployeePayrollTable(connection[0], name, gender, salary, start);
+		Runnable taskAddPayrollDetails = () -> {
+			payrollAdditionStatus.put(employeeId, false);
+			try {
+				boolean tableUpdated = this.addToPayrollDetailsTable(connection[0], employeeId, salary, name, start);
+				if (tableUpdated) {
+					employeePayrollData[0] = new EmployeePayrollData(employeeId, name, gender, salary, start);
+				}
+				payrollAdditionStatus.put(employeeId, tableUpdated);
+			} catch (DatabaseServiceException e) {
+			}
+		};
+		Thread thread = new Thread(taskAddPayrollDetails);
+		thread.start();
+		while (payrollAdditionStatus.containsValue(false)) {
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		try {
+			connection[0].commit();
+		} catch (Exception e) {
+		} finally {
+			if (connection != null) {
+				try {
+					connection[0].close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return employeePayrollData[0];
+	}
+
+	// Inserting to employee payroll table
+	private int addToEmployeePayrollTable(Connection connection, String name, String gender, double salary,
+			LocalDate start) throws DatabaseServiceException {
+		int employeeId = -1;
 		try (Statement statement = connection.createStatement()) {
 			String query = String.format(
 					"insert into employeepayroll(name,gender,salary,start) VALUES ('%s','%s','%s','%s')", name, gender,
@@ -97,8 +144,18 @@ public class EmployeePayrollDBService {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+			try {
+				connection.rollback();
+			} catch (Exception e1) {
+				throw new DatabaseServiceException("Error in adding record employee payroll table");
+			}
 		}
+		return employeeId;
+	}
 
+	// Inserting to payroll details table
+	private Boolean addToPayrollDetailsTable(Connection connection, int employeeId, double salary, String name,
+			LocalDate start) throws DatabaseServiceException {
 		try (Statement statement = connection.createStatement()) {
 			double deductions = salary * 0.2;
 			double taxablePay = salary - deductions;
@@ -108,21 +165,17 @@ public class EmployeePayrollDBService {
 					"insert into payrolldetails(employee_id,basic_pay,deductions,taxable_pay,tax ,net_pay) values (%s,%s,%s,%s,%s,%s)",
 					employeeId, salary, deductions, taxablePay, tax, netPay);
 			int rowAffected = statement.executeUpdate(query);
-			if (rowAffected == 1) {
-				employeePayrollData = new EmployeePayrollData(employeeId, name, salary, start);
-			}
+			if (rowAffected == 1)
+				return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
-		} finally {
-			if (connection != null) {
-				try {
-					connection.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
+			try {
+				connection.rollback();
+			} catch (Exception e1) {
+				throw new DatabaseServiceException("Error in adding record to Payroll details table");
 			}
 		}
-		return employeePayrollData;
+		return false;
 	}
 
 	// Update employee data
