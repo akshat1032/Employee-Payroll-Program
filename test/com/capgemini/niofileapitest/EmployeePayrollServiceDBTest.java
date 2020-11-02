@@ -107,7 +107,7 @@ public class EmployeePayrollServiceDBTest {
 	
 	// Update salary for multiple employees
 	@Test
-	public void givenNewSalariesForMultipleEmployee_WhenUpdated_ShouldSyncWithDB() throws DatabaseServiceException {
+	public void testUpdateSalaryForMultipleEmployees() throws DatabaseServiceException {
 			EmployeePayrollService employeePayrollService = new EmployeePayrollService();
 			employeePayrollService.readEmployeePayrollData(IOService.DB_IO);
 			Map<String, Double> employeeSalaryMap = new HashMap<>();
