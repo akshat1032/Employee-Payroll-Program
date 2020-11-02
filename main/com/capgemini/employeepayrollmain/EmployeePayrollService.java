@@ -113,11 +113,7 @@ public class EmployeePayrollService {
 	public void addEmployeeToPayroll(List<EmployeePayrollData> employeeList) throws DatabaseServiceException{
 		employeeList.forEach(employeePayrollData ->{
 			log.info("Employee being added : "+employeePayrollData.name);
-			try {
-				this.addEmployeeToPayroll(employeePayrollData.name,employeePayrollData.gender, employeePayrollData.salary, employeePayrollData.start, employeePayrollData.departmentId, employeePayrollData.departmentName, employeePayrollData.companyId, employeePayrollData.companyName);
-			} catch (DatabaseServiceException e) {
-				e.printStackTrace();
-			}
+			this.addEmployeeToDatabase(employeePayrollData.name,employeePayrollData.gender, employeePayrollData.salary, employeePayrollData.start);
 			log.info("Employee added : "+employeePayrollData.name);
 		});
 		log.info(""+this.employeePayrollList);

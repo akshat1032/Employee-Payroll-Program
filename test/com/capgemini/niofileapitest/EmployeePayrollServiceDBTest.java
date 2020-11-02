@@ -25,7 +25,7 @@ public class EmployeePayrollServiceDBTest {
 	public void testNormalisedDBReadEmployeeData() {
 		EmployeePayrollService employeePayrollService = new EmployeePayrollService();
 		List<EmployeePayrollData> employeePayrollData = employeePayrollService.readEmployeePayrollData(IOService.DB_IO);
-		Assert.assertEquals(6, employeePayrollData.size());
+		Assert.assertEquals(4, employeePayrollData.size());
 	}
 
 	// Test update salary
@@ -47,7 +47,7 @@ public class EmployeePayrollServiceDBTest {
 		LocalDate end = LocalDate.now();
 		List<EmployeePayrollData> employeePayrollData = employeePayrollService
 				.readEmployeePayrollDataForDateRange(IOService.DB_IO, start, end);
-		Assert.assertEquals(5, employeePayrollData.size());
+		Assert.assertEquals(3, employeePayrollData.size());
 	}
 
 	// Get average salary for employee
@@ -56,7 +56,7 @@ public class EmployeePayrollServiceDBTest {
 		EmployeePayrollService employeePayrollService = new EmployeePayrollService();
 		Map<String, Double> employeePayrollData = employeePayrollService.readAverageSalaryByGender(IOService.DB_IO);
 		Assert.assertTrue(
-				employeePayrollData.get("M").equals(1350000.00) && employeePayrollData.get("F").equals(3000000.00));
+				employeePayrollData.get("M").equals(150000.00) && employeePayrollData.get("F").equals(3000000.00));
 	}
 
 	// Inserting employee to DB
@@ -77,7 +77,7 @@ public class EmployeePayrollServiceDBTest {
 		employeePayrollService.readEmployeePayrollData(IOService.DB_IO);
 		List<EmployeePayrollData> employeePayrollData = employeePayrollService
 				.readEmployeePayrollDataForActiveEmployees(IOService.DB_IO);
-		Assert.assertEquals(5, employeePayrollData.size());
+		Assert.assertEquals(3, employeePayrollData.size());
 	}
 
 	// Adding multiple employees to DB
@@ -86,7 +86,7 @@ public class EmployeePayrollServiceDBTest {
 		EmployeePayrollData[] arrayOfEmployee = {
 				new EmployeePayrollData(0, "Jeff","M",100000.0,LocalDate.now()),
 				new EmployeePayrollData(0, "Bill", "M", 200000.0, LocalDate.now()),
-				new EmployeePayrollData(0, "Mark", "M", 300000.0, LocalDate.now()),
+				new EmployeePayrollData(0, "Raul", "M", 300000.0, LocalDate.now()),
 				new EmployeePayrollData(0, "Mukesh", "M", 400000.0, LocalDate.now()),
 				new EmployeePayrollData(0, "Suresh", "M", 500000.0, LocalDate.now()),
 				new EmployeePayrollData(0, "Ram", "M", 600000.0, LocalDate.now())
@@ -97,6 +97,6 @@ public class EmployeePayrollServiceDBTest {
 		employeePayrollService.addEmployeeToPayroll(Arrays.asList(arrayOfEmployee));
 		Instant end = Instant.now();
 		log.info("Duration without thread : "+Duration.between(start, end));
-		Assert.assertEquals(12, employeePayrollService.countEntries(IOService.DB_IO));
+		Assert.assertEquals(10, employeePayrollService.countEntries(IOService.DB_IO));
 	}
 }
