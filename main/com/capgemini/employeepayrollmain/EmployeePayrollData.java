@@ -6,14 +6,14 @@ public class EmployeePayrollData {
 
 	private int id;
 	public String name;
-	private String gender;
+	public String gender;
 	public double salary;
-	private LocalDate start;
+	public LocalDate start;
 	public String companyName;
 	public int companyId;
 	public String department[];
-	private String departmentName;
-	private int departmentId;
+	public String departmentName;
+	public int departmentId;
 	private boolean isActive;
 
 	// Parameterized constructor to initialize instance members

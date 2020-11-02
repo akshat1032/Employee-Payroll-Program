@@ -53,7 +53,7 @@ public class EmployeePayrollService {
 	public long countEntries(IOService ioService) {
 		if (ioService.equals(IOService.FILE_IO))
 			return new EmployeePayrollFileIOService().countEntries();
-		return 0;
+		return employeePayrollList.size();
 	}
 
 	// Printing the employee payroll data
@@ -108,6 +108,19 @@ public class EmployeePayrollService {
 			String departmentName, int companyId, String companyName) throws DatabaseServiceException {
 		employeePayrollList.add(employeePayrollNormaliseDBService.addEmployeeToDatabase(name, gender, salary, start,
 				departmentId, departmentName, companyId, companyName));
+	}
+	
+	public void addEmployeeToPayroll(List<EmployeePayrollData> employeeList) throws DatabaseServiceException{
+		employeeList.forEach(employeePayrollData ->{
+			log.info("Employee being added : "+employeePayrollData.name);
+			try {
+				this.addEmployeeToPayroll(employeePayrollData.name,employeePayrollData.gender, employeePayrollData.salary, employeePayrollData.start, employeePayrollData.departmentId, employeePayrollData.departmentName, employeePayrollData.companyId, employeePayrollData.companyName);
+			} catch (DatabaseServiceException e) {
+				e.printStackTrace();
+			}
+			log.info("Employee added : "+employeePayrollData.name);
+		});
+		log.info(""+this.employeePayrollList);
 	}
 
 	// Updating the data
