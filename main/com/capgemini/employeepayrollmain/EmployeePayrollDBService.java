@@ -17,6 +17,7 @@ import java.util.logging.*;
 public class EmployeePayrollDBService {
 
 	private static Logger log = Logger.getLogger(EmployeePayrollDBService.class.getName());
+	private int connectionCounter = 0;
 	private PreparedStatement employeePayrollDataStatement;
 	private static EmployeePayrollDBService employeePayrollDBService;
 
@@ -30,14 +31,16 @@ public class EmployeePayrollDBService {
 	}
 
 	// Establishing connection and getting connection object
-	private Connection getConnection() throws SQLException {
+	private synchronized Connection getConnection() throws SQLException {
+		connectionCounter++;
 		String jdbcURL = "jdbc:mysql://localhost:3306/payroll_service?useSSL=false";
 		String userName = "root";
 		String password = "123qwe";
 		Connection con;
-		log.info("Connecting to database : " + jdbcURL);
+		log.info("Processing Thread : " + Thread.currentThread().getName() + "Connecting to database : " + jdbcURL);
 		con = DriverManager.getConnection(jdbcURL, userName, password);
-		log.info("Connection is successful : " + con);
+		log.info("Processing Thread : " + Thread.currentThread().getName() + " ID : " + connectionCounter
+				+ " Connection is successful! " + con);
 		return con;
 	}
 
@@ -74,7 +77,7 @@ public class EmployeePayrollDBService {
 		}
 		return employeePayrollData;
 	}
-	
+
 	public EmployeePayrollData addEmployeeToDatabaseWithPayrollDetails(String name, String gender, double salary,
 			LocalDate start) {
 		int employeeId = -1;
@@ -87,8 +90,8 @@ public class EmployeePayrollDBService {
 		}
 		try (Statement statement = connection.createStatement()) {
 			String query = String.format(
-					"insert into employeepayroll(name,gender,salary,start) VALUES ('%s','%s','%s','%s')", name,
-					gender, salary, Date.valueOf(start));
+					"insert into employeepayroll(name,gender,salary,start) VALUES ('%s','%s','%s','%s')", name, gender,
+					salary, Date.valueOf(start));
 			int rowAffected = statement.executeUpdate(query, Statement.RETURN_GENERATED_KEYS);
 			if (rowAffected == 1) {
 				ResultSet resultSet = statement.getGeneratedKeys();
