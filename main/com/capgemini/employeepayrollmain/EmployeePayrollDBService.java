@@ -37,10 +37,7 @@ public class EmployeePayrollDBService {
 		String userName = "root";
 		String password = "123qwe";
 		Connection con;
-		log.info("Processing Thread : " + Thread.currentThread().getName() + "Connecting to database : " + jdbcURL);
 		con = DriverManager.getConnection(jdbcURL, userName, password);
-		log.info("Processing Thread : " + Thread.currentThread().getName() + " ID : " + connectionCounter
-				+ " Connection is successful! " + con);
 		return con;
 	}
 

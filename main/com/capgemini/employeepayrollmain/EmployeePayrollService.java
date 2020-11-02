@@ -114,11 +114,8 @@ public class EmployeePayrollService {
 	// Adding employee to payroll without using thread
 	public void addEmployeeToPayroll(List<EmployeePayrollData> employeeList) throws DatabaseServiceException{
 		employeeList.forEach(employeePayrollData ->{
-			log.info("Employee being added : "+employeePayrollData.name);
 			this.addEmployeeToDatabase(employeePayrollData.name,employeePayrollData.gender, employeePayrollData.salary, employeePayrollData.start);
-			log.info("Employee added : "+employeePayrollData.name);
 		});
-		log.info(""+this.employeePayrollList);
 	}
 
 	// Adding employee to payroll using thread
@@ -127,10 +124,8 @@ public class EmployeePayrollService {
 		employeeList.forEach(employeePayrollData -> {
 			Runnable task = () -> {
 				employeeAdditionStatus.put(employeePayrollData.hashCode(), false);
-				log.info("Employee being added : "+Thread.currentThread().getName());
 				this.addEmployeeToDatabase(employeePayrollData.name, employeePayrollData.gender, employeePayrollData.salary, employeePayrollData.start);
 				employeeAdditionStatus.put(employeePayrollData.hashCode(), true);
-				log.info("Employee added : "+Thread.currentThread().getName());
 				};
 				Thread thread = new Thread(task, employeePayrollData.name);
 				thread.start();
@@ -139,7 +134,6 @@ public class EmployeePayrollService {
 			try {
 				Thread.sleep(10);
 			}catch(InterruptedException e) {}
-			log.info("\n"+this.employeePayrollList);
 		}
 	}
 	// Updating the data
