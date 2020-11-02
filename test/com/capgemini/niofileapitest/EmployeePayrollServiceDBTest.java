@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -101,6 +102,22 @@ public class EmployeePayrollServiceDBTest {
 		employeePayrollService.addEmployeeToPayrollWithThreads(Arrays.asList(arrayOfEmployee));
 		Instant threadEnd = Instant.now();
 		log.info("Duartion with Thread : "+Duration.between(threadStart, threadEnd));
-		Assert.assertEquals(16, employeePayrollService.countEntries(IOService.DB_IO));
+		Assert.assertEquals(15, employeePayrollService.countEntries(IOService.DB_IO));
+	}
+	
+	// Update salary for multiple employees
+	@Test
+	public void givenNewSalariesForMultipleEmployee_WhenUpdated_ShouldSyncWithDB() throws DatabaseServiceException {
+			EmployeePayrollService employeePayrollService = new EmployeePayrollService();
+			employeePayrollService.readEmployeePayrollData(IOService.DB_IO);
+			Map<String, Double> employeeSalaryMap = new HashMap<>();
+			employeeSalaryMap.put("Dom", 3000000.0);
+			employeeSalaryMap.put("Han", 2500000.0);
+			employeeSalaryMap.put("Gisele", 2000000.0);
+			employeeSalaryMap.put("Brian", 400000.0);
+			employeeSalaryMap.put("Angel", 2500000.0);
+			employeePayrollService.updateMultipleEmployeesSalary(employeeSalaryMap);
+			boolean result = employeePayrollService.checkEmployeePayrollSyncWithDB("Taylor");
+			Assert.assertTrue(result);
 	}
 }

@@ -153,6 +153,27 @@ public class EmployeePayrollService {
 		if (employeePayrollData != null)
 			employeePayrollData.salary = salary;
 	}
+	
+	// Updating salary for multiple employee
+	public void updateMultipleEmployeesSalary(Map<String, Double> employeeSalaryMap) throws DatabaseServiceException {
+		Map<Integer, Boolean> salaryUpdateStatus = new HashMap<Integer, Boolean>();
+		employeeSalaryMap.forEach((employee, salary) -> {
+			Runnable salaryUpdate = () -> {
+				salaryUpdateStatus.put(employee.hashCode(), false);
+				this.updateEmployeeSalary(employee, salary);
+				salaryUpdateStatus.put(employee.hashCode(), true);
+			};
+			Thread thread = new Thread(salaryUpdate, employee);
+			thread.start();
+		});
+		while (salaryUpdateStatus.containsValue(false)) {
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
 	// Returning employee payroll data object
 	private EmployeePayrollData getEmployeePayrollData(String name) {
