@@ -107,5 +107,22 @@ public class EmployeePayrollServiceJSONServerTest {
 		long entries = employeePayrollService.countEntries(IOService.REST_IO);
 		Assert.assertEquals(6, entries);
 	}
+	
+	// Delete employee from server
+	@Test
+	public void givenEmployeeName_WhenDeleted_ShouldMatchStatusCodeandCount() {
+		EmployeePayrollService employeePayrollService;
+		EmployeePayrollData[] arrayOfEmployees = getEmployeeList();
+		employeePayrollService = new EmployeePayrollService(Arrays.asList(arrayOfEmployees));
+		EmployeePayrollData employeePayrollData = employeePayrollService.getEmployeePayrollData("Sasuke");
+		RequestSpecification request = RestAssured.given();
+		request.header("Content-Type", "application/json");
+		Response response = request.delete("/employees/" + employeePayrollData.id);
+		int statusCode = response.getStatusCode();
+		Assert.assertEquals(200, statusCode);
+		employeePayrollService.deleteEmployeePayroll(employeePayrollData.name,IOService.REST_IO);
+		long entries = employeePayrollService.countEntries(IOService.REST_IO);
+		Assert.assertEquals(5, entries);
+	}
 
 }

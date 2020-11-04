@@ -205,6 +205,14 @@ public class EmployeePayrollService {
 			employeePayrollList.add(employeePayrollData);
 	}
 
+	// Deleting employee from server
+	public void deleteEmployeePayroll(String name, IOService ioService) {
+		if (ioService.equals(IOService.REST_IO)) {
+			EmployeePayrollData employeePayrollData = this.getEmployeePayrollData(name);
+			employeePayrollList.remove(employeePayrollData);
+		}
+	}
+
 	public static void main(String[] args) {
 
 		// Welcome message added
@@ -215,5 +223,4 @@ public class EmployeePayrollService {
 		employeePayrollService.readEmployeePayrollData(consoleInputReader);
 		employeePayrollService.writeEmployeePayrollData(IOService.FILE_IO);
 	}
-
 }
