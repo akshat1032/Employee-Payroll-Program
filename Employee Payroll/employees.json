@@ -1,0 +1,26 @@
+{
+  "employees": [
+    {
+      "id": 1,
+      "name": "Jeff Bezos",
+      "gender": "M",
+      "salary": 2000,
+      "start": {
+        "year": 2020,
+        "month": 11,
+        "day": 4
+      }
+    },
+    {
+      "id": 2,
+      "name": "Bill Gates",
+      "gender": "M",
+      "salary": 3000,
+      "start": {
+        "year": 2020,
+        "month": 11,
+        "day": 4
+      }
+    }
+  ]
+}

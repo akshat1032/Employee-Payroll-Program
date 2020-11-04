@@ -12,13 +12,13 @@ import java.util.logging.*;
 public class EmployeePayrollService {
 
 	public enum IOService {
-		CONSOLE_IO, FILE_IO, DB_IO, REST_IO
+		CONSOLE_IO, FILE_IO, DB_IO, REST_IO;
 	}
 
 	private List<EmployeePayrollData> employeePayrollList;
 	private EmployeePayrollDBService employeePayrollDBService;
 	private EmployeePayrollNormaliseDBService employeePayrollNormaliseDBService;
-	static Logger log = Logger.getLogger(EmployeePayrollService.class.getName());
+	public static Logger log = Logger.getLogger(EmployeePayrollService.class.getName());
 
 	public EmployeePayrollService() {
 		employeePayrollDBService = EmployeePayrollDBService.getInstance();
@@ -28,7 +28,7 @@ public class EmployeePayrollService {
 	// Initializing the field which stores employee payroll details
 	public EmployeePayrollService(List<EmployeePayrollData> employeePayrollList) {
 		this();
-		this.employeePayrollList = employeePayrollList;
+		this.employeePayrollList = new ArrayList<>(employeePayrollList);
 	}
 
 	// Taking details for employee from console
@@ -184,6 +184,15 @@ public class EmployeePayrollService {
 		List<EmployeePayrollData> employeePayrollDataList = employeePayrollNormaliseDBService.getEmployeePayrollData(name);
 		return employeePayrollDataList.get(0).equals(getEmployeePayrollData(name));
 	}
+	
+	// Adding employee to payroll from server
+	public void addEmployeePayroll(EmployeePayrollData employeePayrollData, IOService ioService) throws DatabaseServiceException {
+		if (ioService.equals(IOService.DB_IO))
+			this.addEmployeeToDatabase(employeePayrollData.name, employeePayrollData.gender, employeePayrollData.salary,
+					employeePayrollData.start);
+		else
+			employeePayrollList.add(employeePayrollData);
+	}
 
 	public static void main(String[] args) {
 
@@ -195,4 +204,5 @@ public class EmployeePayrollService {
 		employeePayrollService.readEmployeePayrollData(consoleInputReader);
 		employeePayrollService.writeEmployeePayrollData(IOService.FILE_IO);
 	}
+
 }
