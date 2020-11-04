@@ -52,7 +52,7 @@ public class EmployeePayrollServiceJSONServerTest {
 		long entries = employeePayrollService.countEntries(IOService.REST_IO);
 		Assert.assertEquals(2, entries);
 	}
-	
+
 	// Add new employee should match status code and count
 	@Test
 	public void givenNewEmployee_WhenAdded_ShouldMatchStatusCodeAndCount() throws DatabaseServiceException {
@@ -67,7 +67,28 @@ public class EmployeePayrollServiceJSONServerTest {
 		employeePayrollData = new Gson().fromJson(response.asString(), EmployeePayrollData.class);
 		employeePayrollService.addEmployeeToPayroll(employeePayrollData, IOService.REST_IO);
 		long entries = employeePayrollService.countEntries(IOService.REST_IO);
-		Assert.assertEquals(3, entries);
+		Assert.assertEquals(6, entries);
+	}
+
+	// Add multiple employees to server, match status code and count
+	@Test
+	public void givenListOfEmployees_WhenAdded_ShouldMatchStatusCodeAndCount() throws DatabaseServiceException {
+		EmployeePayrollService employeePayrollService;
+		EmployeePayrollData[] arrayOfEmployeesFromServer = getEmployeeList();
+		employeePayrollService = new EmployeePayrollService(Arrays.asList(arrayOfEmployeesFromServer));
+		EmployeePayrollData[] arrayOfEmployees = {
+				new EmployeePayrollData(27, "Sasuke", "M", 50000.00, LocalDate.now()),
+				new EmployeePayrollData(28, "Itachi", "M", 60000.00, LocalDate.now()),
+				new EmployeePayrollData(29, "Sarada", "F", 45000.00, LocalDate.now()) };
+		for (EmployeePayrollData employeePayrollData : arrayOfEmployees) {
+			Response response = addEmployeeToJsonServer(employeePayrollData);
+			int statusCode = response.getStatusCode();
+			Assert.assertEquals(201, statusCode);
+			employeePayrollData = new Gson().fromJson(response.asString(), EmployeePayrollData.class);
+			employeePayrollService.addEmployeeToPayroll(employeePayrollData, IOService.REST_IO);
+		}
+		long entries = employeePayrollService.countEntries(IOService.REST_IO);
+		Assert.assertEquals(5, entries);
 	}
 
 }
