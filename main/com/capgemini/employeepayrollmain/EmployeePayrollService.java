@@ -186,7 +186,7 @@ public class EmployeePayrollService {
 	}
 	
 	// Adding employee to payroll from server
-	public void addEmployeePayroll(EmployeePayrollData employeePayrollData, IOService ioService) throws DatabaseServiceException {
+	public void addEmployeeToPayroll(EmployeePayrollData employeePayrollData, IOService ioService) throws DatabaseServiceException {
 		if (ioService.equals(IOService.DB_IO))
 			this.addEmployeeToDatabase(employeePayrollData.name, employeePayrollData.gender, employeePayrollData.salary,
 					employeePayrollData.start);

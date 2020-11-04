@@ -21,6 +21,20 @@
         "month": 11,
         "day": 4
       }
+    },
+    {
+      "id": 23,
+      "name": "Tiger",
+      "gender": "M",
+      "salary": 3000000,
+      "start": {
+        "year": 2020,
+        "month": 11,
+        "day": 4
+      },
+      "companyId": 0,
+      "departmentId": 0,
+      "isActive": false
     }
   ]
 }
