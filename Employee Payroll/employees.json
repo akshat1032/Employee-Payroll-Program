@@ -26,20 +26,6 @@
       }
     },
     {
-      "id": 27,
-      "name": "Sasuke",
-      "gender": "M",
-      "salary": 50000,
-      "start": {
-        "year": 2020,
-        "month": 11,
-        "day": 4
-      },
-      "companyId": 0,
-      "departmentId": 0,
-      "isActive": false
-    },
-    {
       "id": 28,
       "name": "Itachi",
       "gender": "M",
@@ -72,6 +58,20 @@
       "name": "Tiger",
       "gender": "M",
       "salary": 3000000,
+      "start": {
+        "year": 2020,
+        "month": 11,
+        "day": 4
+      },
+      "companyId": 0,
+      "departmentId": 0,
+      "isActive": false
+    },
+    {
+      "id": 27,
+      "name": "Sasuke",
+      "gender": "M",
+      "salary": 50000,
       "start": {
         "year": 2020,
         "month": 11,
