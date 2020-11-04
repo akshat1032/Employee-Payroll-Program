@@ -42,17 +42,7 @@ public class EmployeePayrollServiceJSONServerTest {
 		request.body(empJson);
 		return request.post("/employees");
 	}
-
-	// Employees retrieved from json server should match count
-	@Test
-	public void givenEmployeeInJSONServer_WhenRetreieved__ShouldMatchCount() throws DatabaseServiceException {
-		EmployeePayrollService employeePayrollService;
-		EmployeePayrollData[] arrayOfEmployees = getEmployeeList();
-		employeePayrollService = new EmployeePayrollService(Arrays.asList(arrayOfEmployees));
-		long entries = employeePayrollService.countEntries(IOService.REST_IO);
-		Assert.assertEquals(6, entries);
-	}
-
+	
 	// Add new employee should match status code and count
 	@Test
 	public void givenNewEmployee_WhenAdded_ShouldMatchStatusCodeAndCount() throws DatabaseServiceException {
@@ -90,7 +80,7 @@ public class EmployeePayrollServiceJSONServerTest {
 		long entries = employeePayrollService.countEntries(IOService.REST_IO);
 		Assert.assertEquals(5, entries);
 	}
-	
+
 	// Update salary for an employee on server
 	@Test
 	public void givenSalaryForEmployee_WhenUpdated_ShouldMatchStatusCode() {
@@ -106,6 +96,16 @@ public class EmployeePayrollServiceJSONServerTest {
 		Response response = request.put("/employees/" + employeePayrollData.id);
 		int statusCode = response.getStatusCode();
 		Assert.assertEquals(200, statusCode);
+	}
+
+	// Retrieve all employees from server
+	@Test
+	public void givenEmployeeDataInJSONServer_WhenRetrieved_ShouldMatchTheCount() {
+		EmployeePayrollData[] arrayOfEmployees = getEmployeeList();
+		EmployeePayrollService employeePayrollService;
+		employeePayrollService = new EmployeePayrollService(Arrays.asList(arrayOfEmployees));
+		long entries = employeePayrollService.countEntries(IOService.REST_IO);
+		Assert.assertEquals(6, entries);
 	}
 
 }

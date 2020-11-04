@@ -4,12 +4,15 @@
       "id": 1,
       "name": "Jeff Bezos",
       "gender": "M",
-      "salary": 2000,
+      "salary": 6000000,
       "start": {
         "year": 2020,
         "month": 11,
         "day": 4
-      }
+      },
+      "companyId": 0,
+      "departmentId": 0,
+      "isActive": false
     },
     {
       "id": 2,
