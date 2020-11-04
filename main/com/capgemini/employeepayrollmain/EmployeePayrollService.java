@@ -71,9 +71,10 @@ public class EmployeePayrollService {
 			this.employeePayrollList = employeePayrollNormaliseDBService.readData();
 		return employeePayrollList;
 	}
-	
+
 	// Reading data for active employees
-	public List<EmployeePayrollData> readEmployeePayrollDataForActiveEmployees(IOService ioService) throws DatabaseServiceException {
+	public List<EmployeePayrollData> readEmployeePayrollDataForActiveEmployees(IOService ioService)
+			throws DatabaseServiceException {
 		if (ioService.equals(IOService.DB_IO))
 			this.employeePayrollList = employeePayrollNormaliseDBService.getActiveEmployeesData();
 		return employeePayrollList;
@@ -99,7 +100,8 @@ public class EmployeePayrollService {
 	}
 
 	// Inserting employee to database
-	public void addEmployeeToDatabase(String name, String gender, double salary, LocalDate start) throws DatabaseServiceException {
+	public void addEmployeeToDatabase(String name, String gender, double salary, LocalDate start)
+			throws DatabaseServiceException {
 		employeePayrollList
 				.add(employeePayrollDBService.addEmployeeToDatabaseWithPayrollDetails(name, gender, salary, start));
 	}
@@ -110,12 +112,13 @@ public class EmployeePayrollService {
 		employeePayrollList.add(employeePayrollNormaliseDBService.addEmployeeToDatabase(name, gender, salary, start,
 				departmentId, departmentName, companyId, companyName));
 	}
-	
+
 	// Adding employee to payroll without using thread
-	public void addEmployeeToPayroll(List<EmployeePayrollData> employeeList) throws DatabaseServiceException{
-		employeeList.forEach(employeePayrollData ->{
+	public void addEmployeeToPayroll(List<EmployeePayrollData> employeeList) throws DatabaseServiceException {
+		employeeList.forEach(employeePayrollData -> {
 			try {
-				this.addEmployeeToDatabase(employeePayrollData.name,employeePayrollData.gender, employeePayrollData.salary, employeePayrollData.start);
+				this.addEmployeeToDatabase(employeePayrollData.name, employeePayrollData.gender,
+						employeePayrollData.salary, employeePayrollData.start);
 			} catch (DatabaseServiceException e) {
 				e.printStackTrace();
 			}
@@ -124,43 +127,48 @@ public class EmployeePayrollService {
 
 	// Adding employee to payroll using thread
 	public void addEmployeeToPayrollWithThreads(List<EmployeePayrollData> employeeList) {
-		Map<Integer,Boolean> employeeAdditionStatus = new HashMap<>();
+		Map<Integer, Boolean> employeeAdditionStatus = new HashMap<>();
 		employeeList.forEach(employeePayrollData -> {
 			Runnable task = () -> {
 				employeeAdditionStatus.put(employeePayrollData.hashCode(), false);
 				try {
-					this.addEmployeeToDatabase(employeePayrollData.name, employeePayrollData.gender, employeePayrollData.salary, employeePayrollData.start);
+					this.addEmployeeToDatabase(employeePayrollData.name, employeePayrollData.gender,
+							employeePayrollData.salary, employeePayrollData.start);
 				} catch (DatabaseServiceException e) {
 					e.printStackTrace();
 				}
 				employeeAdditionStatus.put(employeePayrollData.hashCode(), true);
-				};
-				Thread thread = new Thread(task, employeePayrollData.name);
-				thread.start();
+			};
+			Thread thread = new Thread(task, employeePayrollData.name);
+			thread.start();
 		});
 		while (employeeAdditionStatus.containsValue(false)) {
 			try {
 				Thread.sleep(10);
-			}catch(InterruptedException e) {}
+			} catch (InterruptedException e) {
+			}
 		}
 	}
-	// Updating the data
-	public void updateEmployeeSalary(String name, double salary) {
-		int result = employeePayrollNormaliseDBService.updateEmployeeData(name, salary);
-		if (result == 0)
-			return;
+
+	// Updating the salary data
+	public void updateEmployeeSalary(String name, double salary, IOService ioService) {
+		if (ioService.equals(IOService.DB_IO)) {
+			int result = employeePayrollNormaliseDBService.updateEmployeeData(name, salary);
+			if (result == 0)
+				return;
+		}
 		EmployeePayrollData employeePayrollData = this.getEmployeePayrollData(name);
 		if (employeePayrollData != null)
 			employeePayrollData.salary = salary;
 	}
-	
+
 	// Updating salary for multiple employee
 	public void updateMultipleEmployeesSalary(Map<String, Double> employeeSalaryMap) throws DatabaseServiceException {
 		Map<Integer, Boolean> salaryUpdateStatus = new HashMap<Integer, Boolean>();
 		employeeSalaryMap.forEach((employee, salary) -> {
 			Runnable salaryUpdate = () -> {
 				salaryUpdateStatus.put(employee.hashCode(), false);
-				this.updateEmployeeSalary(employee, salary);
+				this.updateEmployeeSalary(employee, salary, IOService.DB_IO);
 				salaryUpdateStatus.put(employee.hashCode(), true);
 			};
 			Thread thread = new Thread(salaryUpdate, employee);
@@ -176,17 +184,20 @@ public class EmployeePayrollService {
 	}
 
 	// Returning employee payroll data object
-	private EmployeePayrollData getEmployeePayrollData(String name) {
-		return this.employeePayrollList.stream().filter(employeePayrollDataItem -> employeePayrollDataItem.name.equals(name)).findFirst().orElse(null);
+	public EmployeePayrollData getEmployeePayrollData(String name) {
+		return this.employeePayrollList.stream()
+				.filter(employeePayrollDataItem -> employeePayrollDataItem.name.equals(name)).findFirst().orElse(null);
 	}
 
 	public boolean checkEmployeePayrollSyncWithDB(String name) {
-		List<EmployeePayrollData> employeePayrollDataList = employeePayrollNormaliseDBService.getEmployeePayrollData(name);
+		List<EmployeePayrollData> employeePayrollDataList = employeePayrollNormaliseDBService
+				.getEmployeePayrollData(name);
 		return employeePayrollDataList.get(0).equals(getEmployeePayrollData(name));
 	}
-	
+
 	// Adding employee to payroll from server
-	public void addEmployeeToPayroll(EmployeePayrollData employeePayrollData, IOService ioService) throws DatabaseServiceException {
+	public void addEmployeeToPayroll(EmployeePayrollData employeePayrollData, IOService ioService)
+			throws DatabaseServiceException {
 		if (ioService.equals(IOService.DB_IO))
 			this.addEmployeeToDatabase(employeePayrollData.name, employeePayrollData.gender, employeePayrollData.salary,
 					employeePayrollData.start);

@@ -50,7 +50,7 @@ public class EmployeePayrollServiceJSONServerTest {
 		EmployeePayrollData[] arrayOfEmployees = getEmployeeList();
 		employeePayrollService = new EmployeePayrollService(Arrays.asList(arrayOfEmployees));
 		long entries = employeePayrollService.countEntries(IOService.REST_IO);
-		Assert.assertEquals(2, entries);
+		Assert.assertEquals(6, entries);
 	}
 
 	// Add new employee should match status code and count
@@ -89,6 +89,23 @@ public class EmployeePayrollServiceJSONServerTest {
 		}
 		long entries = employeePayrollService.countEntries(IOService.REST_IO);
 		Assert.assertEquals(5, entries);
+	}
+	
+	// Update salary for an employee on server
+	@Test
+	public void givenSalaryForEmployee_WhenUpdated_ShouldMatchStatusCode() {
+		EmployeePayrollService employeePayrollService;
+		EmployeePayrollData[] arrayOfEmployees = getEmployeeList();
+		employeePayrollService = new EmployeePayrollService(Arrays.asList(arrayOfEmployees));
+		employeePayrollService.updateEmployeeSalary("Jeff Bezos", 6000000.0, IOService.REST_IO);
+		EmployeePayrollData employeePayrollData = employeePayrollService.getEmployeePayrollData("Jeff Bezos");
+		String employeeJson = new Gson().toJson(employeePayrollData);
+		RequestSpecification request = RestAssured.given();
+		request.header("Content-Type", "application/json");
+		request.body(employeeJson);
+		Response response = request.put("/employees/" + employeePayrollData.id);
+		int statusCode = response.getStatusCode();
+		Assert.assertEquals(200, statusCode);
 	}
 
 }
