@@ -41,7 +41,7 @@ public class EmployeePayrollServiceTest {
 	public void testUpdateEmployeeDataInDatabase() throws DatabaseServiceException {
 		EmployeePayrollService employeePayrollService = new EmployeePayrollService();
 		List<EmployeePayrollData> employeePayrollList = employeePayrollService.readEmployeePayrollData(IOService.DB_IO);
-		employeePayrollService.updateEmployeeSalary("Terissa", 300000.00);
+		employeePayrollService.updateEmployeeSalary("Terissa", 300000.00, IOService.DB_IO);
 		boolean result = employeePayrollService.checkEmployeePayrollSyncWithDB("Terissa");
 		Assert.assertTrue(result);
 	}

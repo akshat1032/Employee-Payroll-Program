@@ -34,7 +34,7 @@ public class EmployeePayrollServiceDBTest {
 	public void testNormaliseDBUpdateSalary() {
 		EmployeePayrollService employeePayrollService = new EmployeePayrollService();
 		List<EmployeePayrollData> employeePayrollData = employeePayrollService.readEmployeePayrollData(IOService.DB_IO);
-		employeePayrollService.updateEmployeeSalary("Terissa", 3000000.00);
+		employeePayrollService.updateEmployeeSalary("Terissa", 3000000.00, IOService.DB_IO);
 		boolean result = employeePayrollService.checkEmployeePayrollSyncWithDB("Terissa");
 		Assert.assertTrue(result);
 	}

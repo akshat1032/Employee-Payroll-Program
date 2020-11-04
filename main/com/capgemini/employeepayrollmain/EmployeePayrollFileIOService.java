@@ -47,7 +47,8 @@ public class EmployeePayrollFileIOService {
 		try {
 			employeeData = Files.lines(new File("Payroll.txt").toPath())
 					.map(line -> line.toString().split("EMPLOYEE ID :  NAME :  SALARY : ,")).toArray();
-			employeeList.add(new EmployeePayrollData(Integer.parseInt((String) employeeData[0]), (String)employeeData[1], Double.parseDouble((String)employeeData[2])));
+			System.out.println(String.valueOf(employeeData[0]).toString());
+			employeeList.add(new EmployeePayrollData(Integer.parseInt(String.valueOf(employeeData[0]).toString()), String.valueOf(employeeData[1]).toString(), Double.parseDouble(String.valueOf(employeeData[2]).toString())));
 		}catch(IOException e) {}
 		return employeeList;
 	}
